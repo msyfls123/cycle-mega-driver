@@ -1,0 +1,22 @@
+{
+  "name": "cycle-mega-driver",
+  "version": "0.1.0",
+  "description": "Cycle.js Driver for Making Electron Great Again.",
+  "main": "dist/index.js",
+  "module": "lib/index.js",
+  "types": "typings/index.d.ts",
+  "repository": "git@github.com:msyfls123/cycle-mega-driver.git",
+  "author": "msyfls123 <msyfls123@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@swc/core": "^1.3.24",
+    "rollup": "^3.9.0",
+    "rollup-plugin-swc3": "^0.7.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs"
+  }
+}
