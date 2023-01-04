@@ -9,14 +9,25 @@
   "author": "msyfls123 <msyfls123@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@swc/core": "^1.3.24",
+    "electron": "^19",
+    "electron-connect": "^0.6.3",
+    "gulp": "^4.0.2",
     "rollup": "^3.9.0",
     "rollup-plugin-swc3": "^0.7.0",
     "rollup-plugin-typescript2": "^0.34.1",
+    "rxjs": "^7.8.0",
     "tslib": "^2.4.1",
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.mjs"
+    "build": "rollup -c rollup.config.mjs",
+    "watch": "node ./example/watch.mjs",
+    "watch-win": "chcp 65001 && npm run watch"
+  },
+  "peerDependencies": {
+    "electron": "^19"
   }
 }

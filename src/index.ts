@@ -1,1 +1,1 @@
-export const a: number = 1
+export const a: number = 42
