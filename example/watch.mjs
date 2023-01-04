@@ -4,7 +4,7 @@ import connect from 'electron-connect'
 import gulp from 'gulp'
 import { watch } from 'rollup'
 
-import libConfig from '../rollup.config.mjs'
+import libConfigs from '../rollup.config.mjs'
 import { distDir } from './constants.mjs'
 import exampleConfigs from './rollup.config.mjs'
 
@@ -45,4 +45,4 @@ function watchCompile(configs) {
     });
 }
 
-watchCompile([libConfig, ...exampleConfigs])
+watchCompile([...libConfigs, ...exampleConfigs])
