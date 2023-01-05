@@ -1,24 +1,38 @@
 import { BrowserWindow, app } from 'electron'
-import { Subject, from } from 'rxjs'
+import { Subject, Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
+import { Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
 
 interface BrowserWindowEventSubject {
     event: string
     browserWindowId: number
-    args: any[]
+    args?: any[]
 }
 
-export function makeBrowserWindowDriver() {
-    const events = new Set
-    const subject = new Subject<BrowserWindowEventSubject>
-    function select(e: any) {
-        if (!events.has(e)) {
-            events.add(e)
+type ExistedKeys<T> = ({ [P in keyof T]: T[P] extends never ? never : P })[keyof T];
+type Existed<T> = Pick<T, ExistedKeys<T>>;
+
+type BrowserWindowFunctions = Existed<{
+    [K in keyof BrowserWindow]: BrowserWindow[K] extends Function ? BrowserWindow[K] : never
+  }>;
+
+interface BrowserWindowFunctionPayload<T extends keyof BrowserWindowFunctions = any> {
+    id: number
+    method: T
+    args: Parameters<BrowserWindowFunctions[T]>
+}
+
+export class BrowserWindowSource {
+    private events = new Set
+    private event$ = new Subject<BrowserWindowEventSubject>
+    public select(e: string) {
+        if (!this.events.has(e)) {
+            this.events.add(e)
             const addEventListener = (win) => {
                 win.on(e, (...args) => {
-                    subject.next({
+                    this.event$.next({
                         browserWindowId: win.id,
                         event: e,
                         args,
@@ -28,18 +42,23 @@ export function makeBrowserWindowDriver() {
             BrowserWindow.getAllWindows().forEach((win) => addEventListener(win))
             app.on('browser-window-created', (ev, win) => addEventListener(win))
         }
-        return adapt(subject.pipe(filter(({ event }: any) => event === e )) as any)
+        return adapt(this.event$.pipe(filter(({ event }: any) => event === e )) as any) as Observable<BrowserWindowEventSubject>
     }
-    return (sourcesXs$) => {
-        sourcesXs$.addListener({
-            next: i => console.log(i),
-            error: err => console.error(err),
-            complete: () => console.log('completed'),
-          })
-        // const sources = from(sourcesXs$)
-        // sources.subscribe(console.log)
-        return {
-            select,
-        }
+}
+
+export function makeBrowserWindowDriver() {
+    return (xs$: Stream<BrowserWindowFunctionPayload>) => {
+        const manipulation$ = new Observable<BrowserWindowFunctionPayload>((subscriber) => {
+            (xs$ as any).addListener({
+              next: subscriber.next.bind(subscriber),
+              complete: subscriber.complete.bind(subscriber),
+              error: subscriber.error
+            })
+        })
+        manipulation$.subscribe((payload) => {
+            const browserWindow = BrowserWindow.fromId(payload.id)
+            browserWindow[payload.method](...(payload.args ?? []))
+        })
+        return new BrowserWindowSource
     }
 }

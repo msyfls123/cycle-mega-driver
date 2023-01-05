@@ -1,6 +1,7 @@
 import { adapt } from '@cycle/run/lib/adapt'
 import { IpcMainInvokeEvent, ipcMain, webContents } from 'electron'
 import { Observable, Subject, catchError, filter, map, mergeMap, of } from 'rxjs'
+import { Stream } from 'xstream'
 
 interface InvokePayload {
     rawEvent: IpcMainInvokeEvent
@@ -30,10 +31,10 @@ export class IpcMainSource {
             }
         })
     }
-    public handle<T = InvokeResponse>(event: string, handler: (payload: InvokePayload) => Observable<T>) {
+    public handle<T = any>(event: string, handler: (payload: InvokePayload) => Observable<T>) {
         if (!this.invokeEvents.has(event)) {
             this.invokeEvents.add(event)
-            ipcMain.handle(event, (rawEvent, meta, data) => {
+            ipcMain.handle(event, (rawEvent, data) => {
                 return new Promise((resolve, reject) => {
                     this.invoke$.next({
                         rawEvent,
@@ -60,12 +61,12 @@ export class IpcMainSource {
                     }))
                 )
             )
-        ) as any)
+        ) as any) as Observable<InvokeResponse>
     }
 
 }
 export function makeIpcMainDriver() {
-    return (xs$) => {
+    return (xs$: Stream<InvokeResponse>) => {
         const invokeResult$ = new Observable<InvokeResponse>((subscriber) => {
             xs$.addListener({
               next: subscriber.next.bind(subscriber),

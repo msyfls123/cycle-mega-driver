@@ -1,6 +1,6 @@
-import { IpcMainSource, makeBrowserWindowDriver, makeIpcMainDriver } from 'cycle-mega-driver/lib/main'
+import { BrowserWindowSource, IpcMainSource, makeBrowserWindowDriver, makeIpcMainDriver } from 'cycle-mega-driver/lib/main'
 import { BrowserWindow, app, } from 'electron';
-import { ReplaySubject, connectable, merge, timer } from 'rxjs'
+import { ReplaySubject, connectable, merge, of, timer } from 'rxjs'
 import { concatWith, map } from 'rxjs/operators'
 
 import { run } from '@cycle/rxjs-run'
@@ -15,7 +15,7 @@ app.whenReady().then(() => {
     });
     win.loadURL('about:blank');
     win.webContents.openDevTools({ mode: 'right' })
-    const main = ({ browser, ipc }: {ipc: IpcMainSource, browser: any }) => {
+    const main = ({ browser, ipc }: {ipc: IpcMainSource, browser: BrowserWindowSource }) => {
         const output = merge(
             browser.select('blur').pipe(map(() => 'blur')),
             timer(1000).pipe(
@@ -29,9 +29,15 @@ app.whenReady().then(() => {
         })
         visible$.connect();
         const ipcOutput$ = ipc.handle('visible', () => visible$)
+        const toggle$ = ipc.handle('toggle-focus', () => of({}))
+        const browserSink$ = toggle$.pipe(map(({ payload: { data, rawEvent } }) => ({
+                id: BrowserWindow.fromWebContents(rawEvent.sender).id,
+                method: data.method,
+                args: data.args,
+        })))
         return {
-            browser: output,
-            ipc: ipcOutput$,
+            browser: browserSink$,
+            ipc: merge(ipcOutput$, toggle$),
         }
     }
     run(main, {

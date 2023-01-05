@@ -19,8 +19,12 @@ const plugins = [
           parser: {
             syntax: 'typescript',
           },
+          minify: {
+            sourceMap: true
+          },
           target: 'es5',
         },
+        sourceMaps: true,
     }),
 ]
 
@@ -32,7 +36,7 @@ const main = {
     globals: {
         electron: 'require("electron")',
     },
-    sourcemap: true,
+    sourcemap: 'inline',
   },
   external: [
     'electron',
