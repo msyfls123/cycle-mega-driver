@@ -5,9 +5,10 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "declaration": true,
-        "declarationDir": "typings",
+        "declarationDir": "lib",
         "emitDeclarationOnly": true,
         "allowJs": true,
+        "skipLibCheck": true,
         "paths": {
             "cycle-mega-driver": ["."],
             "cycle-mega-driver/*": ["./*"],
@@ -22,11 +23,12 @@
     },
     "include": [
         "src/**/*",
+        "lib/**/*",
         "node_modules/**/*"
     ],
     "exclude": [
-        "lib/**/*",
         "dist/**/*",
+        "lib/**/*",
         "node_modules"
     ]
 }

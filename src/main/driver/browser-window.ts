@@ -10,7 +10,7 @@ interface BrowserWindowEventSubject {
     args: any[]
 }
 
-export function BrowserWindowDriver() {
+export function makeBrowserWindowDriver() {
     const events = new Set
     const subject = new Subject<BrowserWindowEventSubject>
     function select(e: any) {
@@ -36,7 +36,6 @@ export function BrowserWindowDriver() {
             error: err => console.error(err),
             complete: () => console.log('completed'),
           })
-        console.log('11111', Object.keys(sourcesXs$))
         // const sources = from(sourcesXs$)
         // sources.subscribe(console.log)
         return {

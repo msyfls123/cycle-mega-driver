@@ -33,6 +33,10 @@ const plugins = [
     preferBuiltins: true,
   }),
   commonjs(),
+  typescript({
+    // check: false,
+    useTsconfigDeclarationDir: true
+  }),
   swc({
     jsc: {
       parser: {
@@ -41,10 +45,6 @@ const plugins = [
       target: 'es5',
     },
   }),
-  typescript({
-    check: false,
-    useTsconfigDeclarationDir: true
-  })
 ]
 
 const main = {
