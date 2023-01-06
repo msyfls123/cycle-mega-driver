@@ -18,11 +18,13 @@ type BrowserWindowFunctions = Existed<{
     [K in keyof BrowserWindow]: BrowserWindow[K] extends Function ? BrowserWindow[K] : never
   }>;
 
-interface BrowserWindowFunctionPayload<T extends keyof BrowserWindowFunctions = any> {
+type Distribute<U extends keyof BrowserWindowFunctions> = U extends any ? {
     id: number
-    method: T
-    args: Parameters<BrowserWindowFunctions[T]>
-}
+    method: U
+    args: Parameters<BrowserWindowFunctions[U]>
+} : never;
+
+export type BrowserWindowFunctionPayload = Distribute<keyof BrowserWindowFunctions>
 
 export class BrowserWindowSource {
     private events = new Set
@@ -49,7 +51,7 @@ export class BrowserWindowSource {
 export function makeBrowserWindowDriver() {
     return (xs$: Stream<BrowserWindowFunctionPayload>) => {
         const manipulation$ = new Observable<BrowserWindowFunctionPayload>((subscriber) => {
-            (xs$ as any).addListener({
+            xs$.addListener({
               next: subscriber.next.bind(subscriber),
               complete: subscriber.complete.bind(subscriber),
               error: subscriber.error
@@ -57,7 +59,8 @@ export function makeBrowserWindowDriver() {
         })
         manipulation$.subscribe((payload) => {
             const browserWindow = BrowserWindow.fromId(payload.id)
-            browserWindow[payload.method](...(payload.args ?? []))
+            const { method, args } = payload;
+            (browserWindow[method] as Function)(...(args ?? []))
         })
         return new BrowserWindowSource
     }

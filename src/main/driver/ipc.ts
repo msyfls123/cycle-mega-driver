@@ -11,9 +11,9 @@ interface InvokePayload {
     reject: Function
 }
 
-interface InvokeResponse {
+export interface InvokeResponse<T = any> {
     payload: InvokePayload
-    data: any
+    data: T
     error?: Error
 }
 
@@ -61,7 +61,7 @@ export class IpcMainSource {
                     }))
                 )
             )
-        ) as any) as Observable<InvokeResponse>
+        ) as any) as Observable<InvokeResponse<T>>
     }
 
 }
