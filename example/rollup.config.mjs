@@ -44,4 +44,20 @@ const main = {
   plugins,
 }
 
-export default [main];
+const preload = {
+  input: path.join(srcDir, 'preload.ts'),
+  output: {
+    dir: distDir,
+    format: 'iife',
+    globals: {
+        electron: 'require("electron")',
+    },
+    sourcemap: 'inline',
+  },
+  external: [
+    'electron',
+  ],
+  plugins,
+}
+
+export default [main, preload];

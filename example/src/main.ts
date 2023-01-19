@@ -1,3 +1,5 @@
+import path from 'path'
+
 import {
     BrowserWindowSource,
     IpcMainSource,
@@ -15,9 +17,7 @@ import { run } from '@cycle/rxjs-run'
 app.whenReady().then(() => {
     const win = new BrowserWindow({
         webPreferences: {
-            sandbox: false,
-            nodeIntegration: true,
-            contextIsolation: false,
+            preload: path.join(__dirname, 'preload.js')
         }
     });
     win.loadURL('about:blank');
