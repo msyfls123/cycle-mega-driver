@@ -3,16 +3,24 @@ import path from 'path'
 import {
     BrowserWindowSource,
     IpcMainSource,
+    IpcMainSourceNg,
     makeBrowserWindowDriver,
     makeIpcMainDriver,
+    makeIpcMainDriverNg,
+    mergeWithKey,
 } from 'cycle-mega-driver/lib/main'
 import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/driver/browser-window';
 import type { InvokeResponse } from 'cycle-mega-driver/lib/main/driver/ipc';
+import { ChannelConfigToObservable, MapObservable } from 'cycle-mega-driver/src/constants/ipc';
 import { BrowserWindow, app, } from 'electron';
 import { Observable, ReplaySubject, connectable, merge, of, timer } from 'rxjs'
-import { concatWith, map } from 'rxjs/operators'
+import { concatWith, map, startWith, tap } from 'rxjs/operators'
 
 import { run } from '@cycle/rxjs-run'
+
+interface IPCMainConfig {
+    visible: string
+}
 
 app.whenReady().then(() => {
     const win = new BrowserWindow({
@@ -22,20 +30,20 @@ app.whenReady().then(() => {
     });
     win.loadURL('about:blank');
     win.webContents.openDevTools({ mode: 'right' })
-    const main = ({ browser, ipc }: {ipc: IpcMainSource, browser: BrowserWindowSource }): {
+    const main = (
+        { browser, ipc, ipcNg, }:
+        {ipc: IpcMainSource, browser: BrowserWindowSource, ipcNg: IpcMainSourceNg<IPCMainConfig> }
+    ): {
         browser: Observable<BrowserWindowFunctionPayload>
         ipc: Observable<InvokeResponse>
+        ipcNg: Observable<ChannelConfigToObservable<IPCMainConfig>>
     } => {
         const output = merge(
-            browser.select('blur').pipe(map(() => 'blur')),
-            timer(1000).pipe(
-                concatWith(browser.select('focus')),
-                map(() => 'focus')
-            )
+            browser.select('blur').pipe(map(() => 'blur'), startWith('blur')),
+            browser.select('focus').pipe(map(() => 'focus')),
         )
         const visible$ = connectable(output, {
             connector: () => new ReplaySubject(1),
-            resetOnDisconnect: false,
         })
         visible$.connect();
         const ipcOutput$ = ipc.handle('visible', () => visible$)
@@ -48,10 +56,14 @@ app.whenReady().then(() => {
         return {
             browser: browserSink$,
             ipc: merge(ipcOutput$, toggle$),
+            ipcNg: mergeWithKey<IPCMainConfig>({
+                visible: visible$, 
+            })
         }
     }
     run(main, {
         browser: makeBrowserWindowDriver(),
         ipc: makeIpcMainDriver(),
+        ipcNg: makeIpcMainDriverNg<IPCMainConfig>(['visible']),
     })
 })
