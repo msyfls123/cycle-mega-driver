@@ -11,9 +11,9 @@ import {
 } from 'cycle-mega-driver/lib/main'
 import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/driver/browser-window';
 import type { InvokeResponse } from 'cycle-mega-driver/lib/main/driver/ipc';
-import { ChannelConfigToObservable, MapObservable } from 'cycle-mega-driver/src/constants/ipc';
+import { ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable';
 import { BrowserWindow, app, } from 'electron';
-import { Observable, ReplaySubject, connectable, merge, of, timer } from 'rxjs'
+import { Observable, ReplaySubject, connectable, merge, of, throwError, timer } from 'rxjs'
 import { concatWith, map, startWith, tap } from 'rxjs/operators'
 
 import { run } from '@cycle/rxjs-run'
@@ -36,7 +36,7 @@ app.whenReady().then(() => {
     ): {
         browser: Observable<BrowserWindowFunctionPayload>
         ipc: Observable<InvokeResponse>
-        ipcNg: Observable<ChannelConfigToObservable<IPCMainConfig>>
+        ipcNg: Observable<ChannelConfigToSink<IPCMainConfig>>
     } => {
         const output = merge(
             browser.select('blur').pipe(map(() => 'blur'), startWith('blur')),
@@ -56,7 +56,7 @@ app.whenReady().then(() => {
         return {
             browser: browserSink$,
             ipc: merge(ipcOutput$, toggle$),
-            ipcNg: mergeWithKey<IPCMainConfig>({
+            ipcNg: mergeWithKey({
                 visible: visible$, 
             })
         }

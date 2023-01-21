@@ -52,6 +52,7 @@ const main = {
 
   input: {
     main: 'src/main/index.ts',
+    renderer: 'src/renderer/index.ts',
   },
   plugins: [
     ...plugins,
