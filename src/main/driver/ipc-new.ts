@@ -35,6 +35,7 @@ export class IpcMainSourceNg<T extends Obj> {
             sink$.pipe(filter(({ channel }) => !persists.includes(channel)))
         )
         ipcMain.on(IPC_CHANNEL, (event, payload: IpcMainSourceEventPayload<T>) => {
+            const { uuid } = payload
             if (payload.type === 'subscribe') {
                 const subscription = persistentObservable.pipe(
                     filter(({ channel }) => payload.channels.includes(channel))
@@ -42,6 +43,7 @@ export class IpcMainSourceNg<T extends Obj> {
                     next: (res) => {
                         event.reply(IPC_CHANNEL, {
                             type: 'next',
+                            uuid,
                             ...res,
                         })
                     },
@@ -49,6 +51,7 @@ export class IpcMainSourceNg<T extends Obj> {
                         event.reply(IPC_CHANNEL, {
                             type: 'error',
                             channel,
+                            uuid,
                             error: err,
                         })
                     },
