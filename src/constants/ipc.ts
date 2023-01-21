@@ -2,7 +2,8 @@ import { Obj } from '../utils/observable'
 
 const IPC_PREFIX = '$CYCLE_MEGA_DRIVER$'
 
-export const IPC_CHANNEL = `${IPC_PREFIX}_CHANNEL`
+export const IPC_MAIN_CHANNEL = `${IPC_PREFIX}_MAIN_CHANNEL`
+export const IPC_RENDERER_CHANNEL = `${IPC_PREFIX}_RENDERER_CHANNEL`
 
 export type IpcMainSourceEventPayload<T extends Obj> = {
     type: 'subscribe'

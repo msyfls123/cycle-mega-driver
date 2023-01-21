@@ -1,35 +1,35 @@
+import { mergeWithKey } from 'cycle-mega-driver/lib/main';
 import { IpcRendererSource, makeIpcRendererDriverNg } from 'cycle-mega-driver/lib/renderer'
-import { contextBridge, ipcRenderer } from 'electron';
-import { Observable } from 'rxjs';
+import { ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable';
+import { contextBridge } from 'electron';
+import { Observable, Subject } from 'rxjs';
 
 import run from '@cycle/rxjs-run';
 
-interface IPCRendererConfig {
-    visible: string
-}
+import { IPCMainConfig, IPCRendererConfig } from './constants';
 
 const main = (
     { ipc }:
-    { ipc: IpcRendererSource<{}, IPCRendererConfig> }
+    { ipc: IpcRendererSource<IPCRendererConfig, IPCMainConfig> }
 ): {
-    ipc: Observable<{}>
+    ipc: Observable<ChannelConfigToSink<IPCRendererConfig>>
 } => {
+    const blur$ = new Subject<boolean>
     contextBridge.exposeInMainWorld('mega', {
         blur: () => {
-            ipcRenderer.invoke('toggle-focus');
-        },
-        isVisible: () => {
-            return ipcRenderer.invoke('visible');
+            blur$.next(false)
         },
         subscribeVisible: (cb) => {
             ipc.select('visible').subscribe(cb)
         }
     })
     return {
-        ipc: new Observable
+        ipc: mergeWithKey({
+            'toggle-focus': blur$,
+        })
     }
 }
 
 run(main, {
-    ipc: makeIpcRendererDriverNg<{}, IPCRendererConfig>(),
+    ipc: makeIpcRendererDriverNg<IPCRendererConfig, IPCMainConfig>(),
 })

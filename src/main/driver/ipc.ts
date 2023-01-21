@@ -1,79 +1,98 @@
-import { adapt } from '@cycle/run/lib/adapt'
-import { IpcMainInvokeEvent, ipcMain, webContents } from 'electron'
-import { Observable, Subject, catchError, filter, map, mergeMap, of } from 'rxjs'
+import { ipcMain } from 'electron'
+import { Observable, ReplaySubject, Subject, catchError, connectable, filter, from, map, merge, throwError } from 'rxjs'
 import { Stream } from 'xstream'
 
-interface InvokePayload {
-    rawEvent: IpcMainInvokeEvent
-    channel: string
-    data: any
-    resolve: Function
-    reject: Function
-}
+import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, IpcMainSourceEventPayload } from '../../constants/ipc'
+import { ChannelConfigToSink, ChannelConfigToWebSink, MapValueToObservable, Obj } from "../../utils/observable"
 
-export interface InvokeResponse<T = any> {
-    payload: InvokePayload
-    data: T
-    error?: Error
-}
-
-export class IpcMainSource {
-    private events = new Set
-    private invokeEvents = new Set
-    private event$ = new Subject
-    private invoke$ = new Subject<InvokePayload>
-    public constructor(public invokeResult$: Observable<InvokeResponse>) {
-        invokeResult$.subscribe(({ error, payload, data }) => {
-            if (error) {
-                payload.reject(error)
-            } else {
-                payload.resolve(data)
-            }
-        })
-    }
-    public handle<T = any>(event: string, handler: (payload: InvokePayload) => Observable<T>) {
-        if (!this.invokeEvents.has(event)) {
-            this.invokeEvents.add(event)
-            ipcMain.handle(event, (rawEvent, data) => {
-                return new Promise((resolve, reject) => {
-                    this.invoke$.next({
-                        rawEvent,
-                        channel: event,
-                        data,
-                        resolve,
-                        reject,
-                    })
-                })
-            })
-        }
-        return adapt(this.invoke$.pipe(
-            filter(({ channel }) => channel === event),
-            mergeMap(
-                (payload) => handler(payload).pipe(
-                    map((data) => ({
-                        payload,
-                        data,
-                    })),
-                    catchError((error) => of({
-                        payload,
-                        data: null,
-                        error,
-                    }))
+export const mergeWithKey = <T extends Obj>(input: MapValueToObservable<T>) => {
+    return merge(
+        ...(Object.entries(input)
+            .map(
+                ([channel, stream]) => from(stream).pipe(
+                    map((data) => ({ channel, data })),
+                    catchError((err) => throwError(() => ({
+                        channel,
+                        err,
+                    })))
                 )
             )
-        ) as any) as Observable<InvokeResponse<T>>
-    }
-
+        )
+    ) as Observable<ChannelConfigToSink<T>>
 }
-export function makeIpcMainDriver() {
-    return (xs$: Stream<InvokeResponse>) => {
-        const invokeResult$ = new Observable<InvokeResponse>((subscriber) => {
-            xs$.addListener({
-              next: subscriber.next.bind(subscriber),
-              complete: subscriber.complete.bind(subscriber),
-              error: subscriber.error
+
+export class IpcMainSource<Output extends Obj, Input extends Obj> {
+    private output$: Observable<ChannelConfigToSink<Output>>
+    private input$: Subject<ChannelConfigToWebSink<Input>>
+    constructor(
+        sink$: Observable<ChannelConfigToSink<Output>>,
+        cached: Array<keyof Output>,
+    ) {
+        this.input$ = new Subject
+        ipcMain.on(IPC_RENDERER_CHANNEL, (event, payload: ChannelConfigToSink<Input>) => {
+            this.input$.next({
+                event,
+                channel: payload.channel,
+                data: payload.data,
             })
         })
-        return new IpcMainSource(invokeResult$)
+
+        this.output$ = merge(
+            ...cached.map((name) => {
+                const conn = connectable(
+                    sink$.pipe(filter(({ channel }) => channel === name)),
+                    { connector: () => new ReplaySubject(1) }
+                )
+                conn.connect()
+                return conn
+            }),
+            sink$.pipe(filter(({ channel }) => !cached.includes(channel)))
+        )
+        ipcMain.on(IPC_MAIN_CHANNEL, this.handleSubscribe.bind(this))
+    }
+
+    public select<K extends keyof Input>(name: K) {
+        return this.input$.pipe(filter(({ channel }) => name === channel))
+    }
+
+    private handleSubscribe(event, payload: IpcMainSourceEventPayload<Output>) {
+        const { uuid } = payload
+        if (payload.type === 'subscribe') {
+            const subscription = this.output$.pipe(
+                filter(({ channel }) => payload.channels.includes(channel))
+            ).subscribe({
+                next: (res) => {
+                    event.reply(IPC_MAIN_CHANNEL, {
+                        type: 'next',
+                        uuid,
+                        ...res,
+                    })
+                },
+                error: ({ err, channel }) => {
+                    event.reply(IPC_MAIN_CHANNEL, {
+                        type: 'error',
+                        channel,
+                        uuid,
+                        error: err,
+                    })
+                },
+            })
+            event.sender.once('destroyed', () => {
+                subscription.unsubscribe()
+            })
+        }
+    }
+}
+
+export function makeIpcMainDriver<Output extends Obj, Input extends Obj>(cached: Array<keyof Output>) {
+    return (xs$: Stream<ChannelConfigToSink<Output>>) => {
+        const sink$ = new Observable<ChannelConfigToSink<Output>>((subscriber) => {
+            xs$.addListener({
+                next: subscriber.next.bind(subscriber),
+                complete: subscriber.complete.bind(subscriber),
+                error: subscriber.error.bind(subscriber)
+            })
+        })
+        return new IpcMainSource<Output, Input>(sink$, cached)
     }
 }
