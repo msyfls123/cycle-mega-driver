@@ -9,6 +9,7 @@
   "author": "msyfls123 <msyfls123@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@cycle/isolate": "^5.2.0",
     "@cycle/run": "^5.7.0",
     "@cycle/rxjs-run": "^10.5.0",
     "@rollup/plugin-commonjs": "^24.0.0",

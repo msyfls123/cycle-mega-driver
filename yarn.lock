@@ -2,7 +2,15 @@
 # yarn lockfile v1
 
 
-"@cycle/run@^5.7.0":
+"@cycle/isolate@^5.2.0":
+  version "5.2.0"
+  resolved "https://mirrors.tencent.com/npm/@cycle%2fisolate/-/isolate-5.2.0.tgz#42150b2d6ffabf35e745acc8baee5184dda9c474"
+  integrity sha512-BLyyd/EceQnuGaUVSBotdZkBEUeJq1zMbdK7LPdc7WMiJbinkduHue+rOe3BGbK3Ba7LGt7kjRBEfzLke9FGkg==
+  dependencies:
+    "@cycle/run" "^5.2.0"
+    xstream "^11.7.0"
+
+"@cycle/run@^5.2.0", "@cycle/run@^5.7.0":
   version "5.7.0"
   resolved "https://mirrors.tencent.com/npm/@cycle%2frun/-/run-5.7.0.tgz#8ae4e07f96ee7f652eed0f6dd50c9f4143936ce9"
   integrity sha512-HUsUWCIJxoBcBhkKxiLbUg6mSOIDbDtNvmPUJ4EYoVaJg9jf0wA/ojCmWjAh4Bg6o+lfNlO4c96TANFTreF3Kw==
@@ -3015,7 +3023,7 @@ ws@^3.1.0:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-"xstream@10.x || 11.x":
+"xstream@10.x || 11.x", xstream@^11.7.0:
   version "11.14.0"
   resolved "https://mirrors.tencent.com/npm/xstream/-/xstream-11.14.0.tgz#2c071d26b18310523b6877e86b4e54df068a9ae5"
   integrity sha512-1bLb+kKKtKPbgTK6i/BaoAn03g47PpFstlbe1BA+y3pNS/LfvcaghS5BFf9+EE1J+KwSQsEpfJvFN5GqFtiNmw==
