@@ -7,25 +7,25 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 import { distDir, srcDir } from './constants.mjs'
 
-const isProduction = process.env.NODE_ENV === 'production';
+// const isProduction = process.env.NODE_ENV === 'production'
 
 const plugins = [
-    nodeResolve({
-        preferBuiltins: true,
-    }),
-    commonjs(),
-    swc({
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-          },
-          minify: {
-            sourceMap: true
-          },
-          target: 'es5',
-        },
-        sourceMaps: true,
-    }),
+  nodeResolve({
+    preferBuiltins: true
+  }),
+  commonjs(),
+  swc({
+    jsc: {
+      parser: {
+        syntax: 'typescript'
+      },
+      minify: {
+        sourceMap: true
+      },
+      target: 'es5'
+    },
+    sourceMaps: true
+  })
 ]
 
 const main = {
@@ -34,14 +34,14 @@ const main = {
     dir: distDir,
     format: 'cjs',
     globals: {
-        electron: 'require("electron")',
+      electron: 'require("electron")'
     },
-    sourcemap: 'inline',
+    sourcemap: 'inline'
   },
   external: [
-    'electron',
+    'electron'
   ],
-  plugins,
+  plugins
 }
 
 const preload = {
@@ -50,14 +50,14 @@ const preload = {
     dir: distDir,
     format: 'iife',
     globals: {
-        electron: 'require("electron")',
+      electron: 'require("electron")'
     },
-    sourcemap: 'inline',
+    sourcemap: 'inline'
   },
   external: [
-    'electron',
+    'electron'
   ],
-  plugins,
+  plugins
 }
 
-export default [main, preload];
+export default [main, preload]
