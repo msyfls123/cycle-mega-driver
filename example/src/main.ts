@@ -1,23 +1,26 @@
 import path from 'path'
 
-import { IPC_MAIN_CHANNEL } from 'cycle-mega-driver/lib/constants/ipc';
 import {
+    ApplicationMenuSource,
     BrowserWindowSource,
     IpcMainSource,
+    makeApplicationMenuDriver,
     makeBrowserWindowDriver,
     makeIpcMainDriver,
     mergeWithKey,
 } from 'cycle-mega-driver/lib/main'
+import { MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu';
 import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/driver/browser-window';
 import { ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable';
 import { BrowserWindow, app } from 'electron';
-import { Observable, ReplaySubject, connectable, merge } from 'rxjs'
-import { map, startWith, tap } from 'rxjs/operators'
+import { Observable, ReplaySubject, combineLatest, connectable, merge } from 'rxjs'
+import { map, scan, startWith, tap, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
 import { run } from '@cycle/rxjs-run'
 
-import { IPCMainConfig, IPCRendererConfig } from './constants'
+import { Menu } from './component/menu';
+import { IPCMainConfig, IPCRendererConfig, MenuId, TAB_MENU } from './constants'
 
 app.whenReady().then(() => {
     const win = new BrowserWindow({
@@ -35,12 +38,18 @@ app.whenReady().then(() => {
     });
     win2.loadURL('about:blank#123');
     win2.webContents.openDevTools({ mode: 'bottom' })
+
     const main = (
-        { browser, ipc, }:
-        { browser: BrowserWindowSource, ipc: IpcMainSource<IPCMainConfig, IPCRendererConfig> }
+        { browser, ipc, menu }:
+        {
+            browser: BrowserWindowSource,
+            ipc: IpcMainSource<IPCMainConfig, IPCRendererConfig>,
+            menu: ApplicationMenuSource<MenuId>,
+        }
     ): {
         browser: Observable<BrowserWindowFunctionPayload>
         ipc: Observable<ChannelConfigToSink<IPCMainConfig>>
+        menu: Observable<MenuItemOptions[]>
     } => {
         const output = merge(
             browser.select('blur').pipe(map(() => 'blur'), startWith('blur')),
@@ -49,18 +58,49 @@ app.whenReady().then(() => {
         const visible$ = connectable(output, {
             connector: () => new ReplaySubject(1),
         })
-        visible$.connect();
-        const toggle$ = ipc.select('toggle-focus').pipe(tap(data => console.log(data.data)))
+        visible$.connect()
+
+        const browserIds$ = merge(
+            browser.select('show'),
+            browser.select('closed'),
+        ).pipe(
+            scan((acc, { browserWindowId, event }) => {
+                if (event === 'show') {
+                    acc.add(browserWindowId)
+                }
+                if (event === 'closed') {
+                    acc.delete(browserWindowId)
+                }
+                return acc
+            }, new Set<number>),
+            startWith(new Set<number>())
+        )
+        const { menu: menu$ } = Menu({ ipc, browserIds$ })
+
+        const toggle$ = ipc.select('toggle-focus')
         const browserSink$ = toggle$.pipe(map(({ event, data }) => ({
                 id: BrowserWindow.fromWebContents(event.sender).id,
                 method: data ? 'focus' as const : 'blur' as const,
                 args: [] as [],
         })))
+
+        const browserSink2$ = merge(
+            ...TAB_MENU.map((id, index) => menu.select(id).pipe(map(() => index)))
+        ).pipe(
+            withLatestFrom(browserIds$),
+            map(([index, browserIds]) => ({
+                id: Array.from(browserIds)[index],
+                method: 'focus' as const,
+                args: [] as [],
+            }))
+        )
+
         return {
-            browser: browserSink$,
+            browser: merge(browserSink$, browserSink2$),
             ipc: mergeWithKey({
                 visible: visible$, 
-            })
+            }),
+            menu: menu$,
         }
     }
     run(
@@ -70,6 +110,7 @@ app.whenReady().then(() => {
         {
             browser: makeBrowserWindowDriver(),
             ipc: makeIpcMainDriver<IPCMainConfig, IPCRendererConfig>(['visible']),
+            menu: makeApplicationMenuDriver<MenuId>(),
         },
     )
 })

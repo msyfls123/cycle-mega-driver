@@ -33,9 +33,10 @@ export class BrowserWindowSource {
         if (!this.events.has(e)) {
             this.events.add(e)
             const addEventListener = (win) => {
+                const id = win.id
                 win.on(e, (...args) => {
                     this.event$.next({
-                        browserWindowId: win.id,
+                        browserWindowId: id,
                         event: e,
                         args,
                     })
