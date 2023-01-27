@@ -14,7 +14,7 @@ import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/dr
 import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 import { BrowserWindow, app } from 'electron'
 import { type Observable, ReplaySubject, connectable, merge } from 'rxjs'
-import { map, scan, startWith, withLatestFrom } from 'rxjs/operators'
+import { filter, map, scan, startWith, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
 import { run } from '@cycle/rxjs-run'
@@ -78,11 +78,15 @@ app.whenReady().then(() => {
     const { menu: menu$ } = Menu({ ipc, browserIds$ })
 
     const toggle$ = ipc.select('toggle-focus')
-    const browserSink$ = toggle$.pipe(map(({ event }) => ({
-      id: BrowserWindow.fromWebContents(event.sender)?.id ?? 0,
-      method: 'focus' as const,
-      args: [] as []
-    })))
+    const browserSink$ = toggle$.pipe(
+      map(({ browserWindow }) => browserWindow),
+      filter(Boolean),
+      map((browserWindow) => ({
+        id: browserWindow.id,
+        method: 'blur' as const,
+        args: [] as []
+      })),
+    )
 
     const browserSink2$ = merge(
       ...TAB_MENU.map((id, index) => menu.select(id).pipe(map(() => index)))

@@ -12,6 +12,8 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
+    'comma-dangle': 'off',
+    '@typescript-eslint/comma-dangle': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/consistent-type-assertions': 'off',
     '@typescript-eslint/restrict-template-expressions': ['warn', { allowNumber: true }]

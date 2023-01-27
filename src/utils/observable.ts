@@ -1,4 +1,4 @@
-import type { IpcMainEvent } from 'electron'
+import type { BrowserWindow, IpcMainEvent } from 'electron'
 import { Observable } from 'rxjs'
 import { type Stream } from 'xstream'
 
@@ -16,6 +16,7 @@ export type ChannelConfigToWebSource<T extends Obj> = {
     channel: K
     data: T[K]
     event: IpcMainEvent
+    browserWindow?: BrowserWindow
   }
 }[keyof T]
 

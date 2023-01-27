@@ -1,4 +1,4 @@
-import { type IpcMainEvent, ipcMain } from 'electron'
+import { type IpcMainEvent, ipcMain, BrowserWindow } from 'electron'
 import { type Observable, ReplaySubject, Subject, catchError, connectable, filter, from, map, merge, throwError } from 'rxjs'
 import { type Stream } from 'xstream'
 
@@ -105,7 +105,8 @@ class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMain
     this.rawInput$.next({
       event,
       channel: payload.channel,
-      data: payload.data
+      data: payload.data,
+      browserWindow: BrowserWindow.fromWebContents(event.sender) ?? undefined,
     })
   }
 
