@@ -1,8 +1,7 @@
-import { ipcRenderer } from 'electron'
 import { Observable } from 'rxjs'
 import { type Stream } from 'xstream'
 
-import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcMainSourceEventPayload, type IpcMainSourceEventResponse } from '../../constants/ipc'
+import { IPC_INTERCEPTOR, type IpcMainSourceEventResponse } from '../../constants/ipc'
 import { type ChannelConfigToSink, type Obj } from '../../utils/observable'
 
 let uuid = 0
@@ -10,21 +9,15 @@ let uuid = 0
 export class IpcRendererSource<Output extends Obj, Input extends Obj> {
   constructor (sink$: Observable<ChannelConfigToSink<Output>>) {
     sink$.subscribe((payload) => {
-      ipcRenderer.send(IPC_RENDERER_CHANNEL, payload)
+      window[IPC_INTERCEPTOR].send(payload)
     })
   }
 
   public select<K extends keyof Input>(name: K) {
     uuid += 1
     const channelUUID = String(uuid)
-    ipcRenderer.send(IPC_MAIN_CHANNEL, {
-      type: 'subscribe',
-      channels: [name],
-      uuid: channelUUID
-    } as IpcMainSourceEventPayload<Input[K]>)
     const observable = new Observable((subscriber) => {
-      ipcRenderer.on(IPC_MAIN_CHANNEL, (event, res: IpcMainSourceEventResponse<Input>) => {
-        if (!(res.channel === name && res.uuid === channelUUID)) return
+      const handler = (res: IpcMainSourceEventResponse<Input>) => {
         switch (res.type) {
           case 'next':
             subscriber.next(res.data)
@@ -38,7 +31,8 @@ export class IpcRendererSource<Output extends Obj, Input extends Obj> {
           default:
             break
         }
-      })
+      }
+      return window[IPC_INTERCEPTOR].subscribe(name as string, channelUUID, handler)
     })
     return observable
   }

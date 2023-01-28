@@ -4,7 +4,11 @@
   "description": "Cycle.js Driver for Making Electron Great Again.",
   "main": "dist/index.js",
   "module": "lib/index.js",
-  "types": "typings/index.d.ts",
+  "files": [
+    "lib/",
+    "dist/",
+    "example/dist/"
+  ],
   "repository": "git@github.com:msyfls123/cycle-mega-driver.git",
   "author": "msyfls123 <msyfls123@gmail.com>",
   "license": "MIT",

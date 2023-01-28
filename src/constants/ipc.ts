@@ -1,5 +1,6 @@
 import { type Obj } from '../utils/observable'
 
+export const IPC_INTERCEPTOR = '$CYCLE_MEGA_IPC_INTERCEPTOR$'
 const IPC_PREFIX = '$CYCLE_MEGA_DRIVER$'
 
 export const IPC_MAIN_CHANNEL = `${IPC_PREFIX}_MAIN_CHANNEL`

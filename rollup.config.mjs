@@ -28,6 +28,20 @@ const commonConfig = {
   ],
 }
 
+const preloadConfig = {
+  output: {
+    name: 'MEGA_PRELOAD',
+    dir: 'dist',
+    format: 'iife',
+    globals: {
+      electron: 'require("electron")',
+    },
+  },
+  external: [
+    'electron',
+  ],
+}
+
 const plugins = [
   nodeResolve({
     preferBuiltins: true,
@@ -59,4 +73,14 @@ const main = {
   ],
 }
 
-export default [main]
+const preload = {
+  ...preloadConfig,
+  input: {
+    preload: 'src/renderer/preload.ts',
+  },
+  plugins: [
+    ...plugins,
+  ]
+}
+
+export default [main, preload]

@@ -3,6 +3,7 @@ import { type IpcRendererSource, makeIpcRendererDriverNg } from 'cycle-mega-driv
 import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 import { contextBridge } from 'electron'
 import { type Observable, Subject } from 'rxjs'
+import 'cycle-mega-driver/dist/preload'
 
 import run from '@cycle/rxjs-run'
 
