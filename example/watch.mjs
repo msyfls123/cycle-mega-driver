@@ -2,21 +2,30 @@ import path from 'path'
 
 import connect from 'electron-connect'
 import gulp from 'gulp'
+import _ from 'lodash'
 import { watch } from 'rollup'
 
 import libConfigs from '../rollup.config.mjs'
 import { distDir } from './constants.mjs'
 import exampleConfigs from './rollup.config.mjs'
 
-const electron = connect.server.create();
-const args = [path.join(distDir, 'main.js')];
+const electron = connect.server.create()
+const args = [path.join(distDir, 'main.js')]
+
+const restart = _.debounce(() => new Promise((resolve) => {
+    electron.restart(args, (state) => {
+        if (state === 'restarted') {
+            resolve()
+        }
+    })
+}), 300)
 
 function watchCompile(configs) {
-    const watcher = watch(configs);
-    let started = false;
+    const watcher = watch(configs)
+    let started = false
     watcher.on('event', (event) => {
         if (/error/i.test(event.code)) {
-            console.error(event);
+            console.error(event)
         }
         if (event.code === 'END' && !started) {
             // Start browser process
@@ -26,21 +35,17 @@ function watchCompile(configs) {
                 '**/*',
                 '!renderer/**/*'
             ], { cwd: distDir }, (done) => {
-                electron.restart(args, (state) => {
-                    if (state === 'restarted') {
-                        done();
-                    }
-                });
-            });
+                restart().then(done)
+            })
             // Reload renderer process
             gulp.watch([
                 'renderer/**/*',
             ], { cwd: distDir }, (done) => {
-                electron.reload();
+                electron.reload()
                 // 3000ms is hard coded in electron-connect
-                setTimeout(done, 3000);
-            });
-            started = true;
+                setTimeout(done, 3000)
+            })
+            started = true
         }
     });
 }
