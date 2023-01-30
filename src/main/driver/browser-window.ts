@@ -1,6 +1,6 @@
 import { BrowserWindow, app } from 'electron'
 import { Subject, Observable, BehaviorSubject } from 'rxjs'
-import { filter } from 'rxjs/operators'
+import { filter, map, scan, tap } from 'rxjs/operators'
 import { type Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
@@ -50,12 +50,45 @@ export class BrowserWindowSource {
   }
 
   public allWindows () {
-    const subject = new BehaviorSubject(BrowserWindow.getAllWindows())
-    app.on('browser-window-created', (event, win) => {
-      subject.next(BrowserWindow.getAllWindows())
-      win.once('closed', () => { subject.next(BrowserWindow.getAllWindows()) })
+    interface AllWindowEvent {
+      type: 'initial' | 'add' | 'remove'
+      windows: BrowserWindow[]
+    }
+    const existed = BrowserWindow.getAllWindows()
+    const subject = new BehaviorSubject<AllWindowEvent>({
+      type: 'initial',
+      windows: existed
     })
-    return subject.asObservable()
+
+    const windows$ = subject.pipe(
+      tap(({ type, windows }) => {
+        if (type !== 'remove') {
+          windows.forEach(win => {
+            win.once('closed', () => {
+              subject.next({
+                type: 'remove',
+                windows: [win]
+              })
+            })
+          })
+        }
+      }),
+      scan((acc, payload) => {
+        switch (payload.type) {
+          case 'initial':
+            return new Set(payload.windows)
+          case 'add':
+            payload.windows.forEach(acc.add, acc)
+            return acc
+          case 'remove':
+            payload.windows.forEach(acc.delete, acc)
+            return acc
+        }
+      }, new Set<BrowserWindow>()),
+      map(set => Array.from(set))
+    )
+
+    return windows$
   }
 }
 
