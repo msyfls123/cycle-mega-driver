@@ -14,7 +14,7 @@ import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/dr
 import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 import { BrowserWindow, app } from 'electron'
 import { type Observable, ReplaySubject, connectable, merge } from 'rxjs'
-import { filter, map, scan, startWith, withLatestFrom } from 'rxjs/operators'
+import { filter, map, startWith, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
 import { run } from '@cycle/rxjs-run'
@@ -60,20 +60,8 @@ app.whenReady().then(() => {
     })
     visible$.connect()
 
-    const browserIds$ = merge(
-      browser.select('show'),
-      browser.select('closed')
-    ).pipe(
-      scan((acc, { browserWindowId, event }) => {
-        if (event === 'show') {
-          acc.add(browserWindowId)
-        }
-        if (event === 'closed') {
-          acc.delete(browserWindowId)
-        }
-        return acc
-      }, new Set<number>()),
-      startWith(new Set<number>())
+    const browserIds$ = browser.allWindows().pipe(
+      map((windows) => new Set(windows.map(w => w.id)))
     )
     const { menu: menu$ } = Menu({ ipc, browserIds$ })
 

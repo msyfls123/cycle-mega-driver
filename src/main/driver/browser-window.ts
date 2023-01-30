@@ -1,5 +1,5 @@
 import { BrowserWindow, app } from 'electron'
-import { Subject, Observable } from 'rxjs'
+import { Subject, Observable, BehaviorSubject } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { type Stream } from 'xstream'
 
@@ -29,6 +29,7 @@ export type BrowserWindowFunctionPayload = Distribute<keyof BrowserWindowFunctio
 export class BrowserWindowSource {
   private readonly events = new Set()
   private readonly event$ = new Subject<BrowserWindowEventSubject>()
+
   public select (e: string) {
     if (!this.events.has(e)) {
       this.events.add(e)
@@ -46,6 +47,15 @@ export class BrowserWindowSource {
       app.on('browser-window-created', (ev, win) => { addEventListener(win) })
     }
     return adapt(this.event$.pipe(filter(({ event }: any) => event === e)) as any) as Observable<BrowserWindowEventSubject>
+  }
+
+  public allWindows () {
+    const subject = new BehaviorSubject(BrowserWindow.getAllWindows())
+    app.on('browser-window-created', (event, win) => {
+      subject.next(BrowserWindow.getAllWindows())
+      win.once('closed', () => { subject.next(BrowserWindow.getAllWindows()) })
+    })
+    return subject.asObservable()
   }
 }
 
