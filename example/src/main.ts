@@ -7,10 +7,9 @@ import {
   makeApplicationMenuDriver,
   makeBrowserWindowDriver,
   makeIpcMainDriver,
-  mergeWithKey
+  mergeWithKey,
 } from 'cycle-mega-driver/lib/main'
 import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
-import type { BrowserWindowFunctionPayload } from 'cycle-mega-driver/lib/main/driver/browser-window'
 import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 import { BrowserWindow, app } from 'electron'
 import { type Observable, ReplaySubject, connectable, merge } from 'rxjs'
@@ -21,6 +20,7 @@ import { run } from '@cycle/rxjs-run'
 
 import { Menu } from './component/Menu'
 import { type IPCMainConfig, type IPCRendererConfig, type MenuId, TAB_MENU } from './constants'
+import { type BrowserWindowAction } from 'cycle-mega-driver/lib/constants/browser-window'
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
@@ -47,7 +47,7 @@ app.whenReady().then(() => {
       menu: ApplicationMenuSource<MenuId>
     }
   ): {
-    browser: Observable<BrowserWindowFunctionPayload>
+    browser: Observable<BrowserWindowAction>
     ipc: Observable<ChannelConfigToSink<IPCMainConfig>>
     menu: Observable<MenuItemOptions[]>
   } => {
@@ -69,10 +69,8 @@ app.whenReady().then(() => {
     const browserSink$ = toggle$.pipe(
       map(({ browserWindow }) => browserWindow),
       filter(Boolean),
-      map((browserWindow) => ({
-        id: browserWindow.id,
-        method: 'blur' as const,
-        args: [] as []
+      map(() => ({
+        focus: false,
       })),
     )
 
@@ -82,8 +80,7 @@ app.whenReady().then(() => {
       withLatestFrom(browserIds$),
       map(([index, browserIds]) => ({
         id: Array.from(browserIds)[index],
-        method: 'focus' as const,
-        args: [] as []
+        focus: true,
       }))
     )
 
@@ -97,12 +94,13 @@ app.whenReady().then(() => {
   }
   run(
     isolate(main, {
-      ipc: win.webContents.id
+      ipc: win.webContents.id,
+      browser: win.id,
     }),
     {
       browser: makeBrowserWindowDriver(),
       ipc: makeIpcMainDriver<IPCMainConfig, IPCRendererConfig>(['visible']),
-      menu: makeApplicationMenuDriver<MenuId>()
+      menu: makeApplicationMenuDriver<MenuId>(),
     }
   )
 }).catch(console.error)
