@@ -1,6 +1,6 @@
 {
   "name": "cycle-mega-driver",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cycle.js Driver for Making Electron Great Again.",
   "main": "dist/index.js",
   "module": "lib/index.js",
@@ -36,6 +36,7 @@
     "typescript": "*"
   },
   "scripts": {
+    "clean": "rimraf dist lib example/dist",
     "build": "rollup -c rollup.config.mjs",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
