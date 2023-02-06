@@ -1,26 +1,29 @@
 import { type IpcMainEvent, ipcMain, BrowserWindow } from 'electron'
-import { type Observable, ReplaySubject, Subject, catchError, connectable, filter, from, map, merge, throwError } from 'rxjs'
+import { type Observable, ReplaySubject, Subject, connectable, filter, map, merge } from 'rxjs'
 import { type Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
 
 import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcMainSourceEventPayload } from '../../constants/ipc'
-import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable } from '../../utils/observable'
+import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries } from '../../utils/observable'
 
 export const mergeWithKey = <T extends Obj>(input: MapValueToObservable<T>) => {
-  return merge(
-    ...(Object.entries(input)
-      .map(
-        ([channel, stream]) => from(stream).pipe(
-          map((data) => ({ channel, data })),
-          catchError((err) => throwError(() => ({
-            channel,
-            err
-          })))
-        )
-      )
-    )
+  return intoEntries(input).pipe(
+    map(({ key, value }) => ({ channel: key, data: value }))
   ) as Observable<ChannelConfigToWebSink<T>>
+  // return merge(
+  //   ...(Object.entries(input)
+  //     .map(
+  //       ([channel, stream]) => from(stream).pipe(
+  //         map((data) => ({ channel, data })),
+  //         catchError((err) => throwError(() => ({
+  //           channel,
+  //           err
+  //         })))
+  //       )
+  //     )
+  //   )
+  // ) as Observable<ChannelConfigToWebSink<T>>
 }
 
 export class IpcMainSource<Output extends Obj, Input extends Obj> {

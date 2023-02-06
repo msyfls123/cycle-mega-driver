@@ -1,10 +1,13 @@
 import { adapt } from '@cycle/run/lib/adapt'
 import type { BrowserWindow, IpcMainEvent } from 'electron'
-import { Observable } from 'rxjs'
+import { Observable, catchError, filter, from, map, merge, throwError } from 'rxjs'
 import { type Stream } from 'xstream'
 
 export type Obj = Record<string, any>
 
+/**
+ * raw messages between main and renderer
+ */
 export type ChannelConfigToSink<T extends Obj> = {
   [K in keyof T]: {
     channel: K
@@ -12,6 +15,9 @@ export type ChannelConfigToSink<T extends Obj> = {
   }
 }[keyof T]
 
+/**
+ * renderer to main messages
+ */
 export type ChannelConfigToWebSource<T extends Obj> = {
   [K in keyof T]: {
     channel: K
@@ -21,6 +27,9 @@ export type ChannelConfigToWebSource<T extends Obj> = {
   }
 }[keyof T]
 
+/**
+ * main to renderer messages
+ */
 export type ChannelConfigToWebSink<T extends Obj> = {
   [K in keyof T]: {
     channel: K
@@ -45,4 +54,39 @@ export function xsToObservable<T> (xs$: Stream<T>) {
 
 export function adaptObservable<T> (observable: Observable<T>) {
   return adapt(observable as any) as Observable<T>
+}
+
+export type IntoEntries<T extends Obj> = {
+  [K in keyof T]: {
+    key: K
+    value: T[K]
+  }
+}[keyof T]
+
+/**
+ * https://stackoverflow.com/a/65376116
+ */
+export type FromEntreis<I extends IntoEntries<Obj>> = { [T in I as T['key']]: T['value'] }
+
+export const intoEntries = <T extends Obj>(input: MapValueToObservable<T>) => {
+  return merge(
+    ...(Object.entries(input)
+      .map(
+        ([key, stream]) => from(stream).pipe(
+          map((value) => ({ key, value })),
+          catchError((err) => throwError(() => ({
+            key,
+            err
+          })))
+        )
+      )
+    )
+  ) as Observable<IntoEntries<T>>
+}
+
+export function pick<T extends IntoEntries<Obj>, K extends T['key']> (name: K) {
+  return (source: Observable<T>) => source.pipe(
+    filter(({ key }) => key === name),
+    map(data => data.value),
+  ) as Observable<FromEntreis<T>[K]>
 }

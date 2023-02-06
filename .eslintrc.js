@@ -12,6 +12,7 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
+    'semi': ['error', 'never'],
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

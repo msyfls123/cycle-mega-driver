@@ -11,15 +11,15 @@ export function Menu (
     browserIds$: Observable<Set<number>>
   }
 ): {
-    menu: Observable<MenuItemOptions[]>
+    menuTemplate: Observable<MenuItemOptions[]>
   } {
   return {
-    menu: combineLatest([
+    menuTemplate: combineLatest([
       ipc.select('language').pipe(startWith({})),
       browserIds$.pipe(startWith(new Set<number>()))
     ]).pipe(
       map(([language, browserIds]) => {
-        return [
+        const template: MenuItemOptions[] = [
           {
             label: 'App',
             submenu: [
@@ -27,6 +27,17 @@ export function Menu (
                 label: 'Love',
                 id: MenuId.Love,
                 accelerator: 'CmdOrCtrl+L'
+              },
+              {
+                label: 'Quit',
+                id: MenuId.Quit,
+                accelerator: 'CmdOrCtrl+Q'
+              },
+              {
+                label: 'Enable Quit',
+                id: MenuId.EnableQuit,
+                type: 'checkbox',
+                checked: true,
               }
             ]
           },
@@ -39,6 +50,7 @@ export function Menu (
             }))
           }
         ]
+        return template
       })
     )
   }

@@ -1,5 +1,6 @@
 export interface IPCMainConfig {
   visible: string
+  test: boolean // nothing to do
 }
 
 export interface IPCRendererConfig {
@@ -9,6 +10,8 @@ export interface IPCRendererConfig {
 
 export enum MenuId {
   Love = 'love',
+  Quit = 'quit',
+  EnableQuit = 'enable-quit',
   Tab1 = 'tab1',
   Tab2 = 'tab2',
   Tab3 = 'tab3',
