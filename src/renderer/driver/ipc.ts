@@ -2,7 +2,7 @@ import { Observable } from 'rxjs'
 import { type Stream } from 'xstream'
 
 import { IPC_INTERCEPTOR, type IpcMainSourceEventResponse } from '../../constants/ipc'
-import { type ChannelConfigToSink, type Obj } from '../../utils/observable'
+import { adaptObservable, type ChannelConfigToSink, type Obj } from '../../utils/observable'
 
 let uuid = 0
 
@@ -16,7 +16,7 @@ export class IpcRendererSource<Output extends Obj, Input extends Obj> {
   public select<K extends keyof Input>(name: K) {
     uuid += 1
     const channelUUID = String(uuid)
-    const observable = new Observable((subscriber) => {
+    const observable = new Observable<Input[K]>((subscriber) => {
       const handler = (res: IpcMainSourceEventResponse<Input>) => {
         switch (res.type) {
           case 'next':
@@ -34,7 +34,7 @@ export class IpcRendererSource<Output extends Obj, Input extends Obj> {
       }
       return window[IPC_INTERCEPTOR].subscribe(name as string, channelUUID, handler)
     })
-    return observable
+    return adaptObservable(observable)
   }
 }
 

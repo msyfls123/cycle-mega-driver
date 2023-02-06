@@ -1,3 +1,4 @@
+import { adapt } from '@cycle/run/lib/adapt'
 import type { BrowserWindow, IpcMainEvent } from 'electron'
 import { Observable } from 'rxjs'
 import { type Stream } from 'xstream'
@@ -40,4 +41,8 @@ export function xsToObservable<T> (xs$: Stream<T>) {
       error: subscriber.error.bind(subscriber)
     })
   })
+}
+
+export function adaptObservable<T> (observable: Observable<T>) {
+  return adapt(observable as any) as Observable<T>
 }
