@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import { adaptObservable, xsToObservable, type IntoEntries, pick } from '../../utils/observable'
-import { type Observable, fromEvent, withLatestFrom, startWith } from 'rxjs'
+import { type Observable, fromEvent, withLatestFrom, startWith, delayWhen, connectable, ReplaySubject } from 'rxjs'
 
 import { type Stream } from 'xstream'
 
@@ -16,7 +16,7 @@ export class AppLifecycleSource {
   /**
    * You should do almost everything after this.
    */
-  public ready$ = adaptObservable(fromEvent(app, 'ready'))
+  private readonly innerReady$: Observable<unknown>
 
   /**
    * Maybe a good time to quit app.
@@ -35,6 +35,13 @@ export class AppLifecycleSource {
    * App will quit right now with the code.
    */
   public quit$ = adaptObservable(fromEvent(app, 'quit', (e, exitCode: number) => ({ exitCode })))
+
+  /**
+   * Used to being piped by other sinks like ipc and browser.
+   */
+  public whenReady = <T>(observable: Observable<T>) => observable.pipe(
+    delayWhen(() => this.innerReady$)
+  )
 
   constructor (sink$: Observable<AppLifecycleSink>) {
     const state$ = sink$.pipe(pick('state'), startWith('default' as const))
@@ -61,6 +68,13 @@ export class AppLifecycleSource {
         quitEvent.preventDefault()
       }
     })
+
+    const innerReady$ = connectable(
+      fromEvent(app, 'ready'),
+      { connector: () => new ReplaySubject(1) }
+    )
+    innerReady$.connect()
+    this.innerReady$ = innerReady$
   }
 }
 

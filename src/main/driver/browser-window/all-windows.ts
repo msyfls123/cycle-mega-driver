@@ -1,49 +1,63 @@
-import { BrowserWindow } from 'electron'
-import { BehaviorSubject, ReplaySubject, connectable, map, scan, tap } from 'rxjs'
+import { BrowserWindow, app } from 'electron'
+import { ReplaySubject, Subject, connectable, filter, map, scan, tap } from 'rxjs'
 
 export function getAllWindows () {
   interface AllWindowEvent {
-    type: 'initial' | 'add' | 'remove'
-    windows: BrowserWindow[]
+    type: 'add' | 'remove'
+    window: BrowserWindow
   }
   const existed = BrowserWindow.getAllWindows()
-  const subject = new BehaviorSubject<AllWindowEvent>({
-    type: 'initial',
-    windows: existed
-  })
+  const subject = new Subject<AllWindowEvent>()
+
+  const add = (win) => {
+    subject.next({
+      type: 'add',
+      window: win,
+    })
+  }
+  app.on('browser-window-created', (e, window) => { add(window) })
 
   const windows$ = subject.pipe(
-    tap(({ type, windows }) => {
+    tap(({ type, window }) => {
       if (type !== 'remove') {
-        windows.forEach(win => {
-          win.once('closed', () => {
-            subject.next({
-              type: 'remove',
-              windows: [win]
-            })
+        window.once('closed', () => {
+          subject.next({
+            type: 'remove',
+            window,
           })
         })
       }
     }),
     scan((acc, payload) => {
       switch (payload.type) {
-        case 'initial':
-          return new Set(payload.windows)
         case 'add':
-          payload.windows.forEach(acc.add, acc)
+          acc.add(payload.window)
           return acc
         case 'remove':
-          payload.windows.forEach(acc.delete, acc)
+          acc.delete(payload.window)
           return acc
       }
     }, new Set<BrowserWindow>()),
     map(set => Array.from(set))
   )
 
-  const conn = connectable(windows$, {
+  const allWindows$ = connectable(windows$, {
     connector: () => new ReplaySubject(1),
   })
-  conn.connect()
+  allWindows$.connect()
 
-  return conn
+  const newWindow$ = connectable(
+    subject.pipe(filter(({ type }) => type === 'add'), map(({ window }) => window)),
+    {
+      connector: () => new ReplaySubject(1),
+    },
+  )
+  newWindow$.connect()
+
+  existed.forEach(add)
+
+  return {
+    allWindows$,
+    newWindow$,
+  }
 }

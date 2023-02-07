@@ -4,7 +4,7 @@ import { type BrowserWindowAction, type BrowserWindowEvent } from '../../../cons
 import { adapt } from '@cycle/run/lib/adapt'
 import { type Stream } from 'xstream'
 import { xsToObservable } from 'cycle-mega-driver/src/utils/observable'
-import { actionHander } from './action-hander'
+import { actionHandler } from './action-handler'
 import { getAllWindows } from './all-windows'
 import { listenToBrowserWindowEvents } from './event-emitter'
 import { type BrowserWindow } from 'electron'
@@ -12,6 +12,7 @@ import { type BrowserWindow } from 'electron'
 interface BrowserWindowSourceShared {
   rawEvent$: Observable<BrowserWindowEvent>
   allWindows$: Observable<BrowserWindow[]>
+  newWindow$: Observable<BrowserWindow>
 }
 
 export class BrowserWindowSource {
@@ -54,6 +55,10 @@ export class BrowserWindowSource {
     return adapt(this.shared.allWindows$ as any) as Observable<BrowserWindow[]>
   }
 
+  public newWindow () {
+    return adapt(this.shared.newWindow$ as any) as Observable<BrowserWindow>
+  }
+
   private getShared () {
     return this.shared
   }
@@ -61,7 +66,7 @@ export class BrowserWindowSource {
 
 function createSource () {
   const subject = new Subject<BrowserWindowEvent>()
-  const allWindows$ = getAllWindows()
+  const { allWindows$, newWindow$ } = getAllWindows()
   allWindows$.pipe(
     startWith(<BrowserWindow[]>[]),
     pairwise(),
@@ -83,13 +88,14 @@ function createSource () {
   return new BrowserWindowSource({
     rawEvent$: subject.asObservable(),
     allWindows$,
+    newWindow$,
   })
 }
 
 export function makeBrowserWindowDriver () {
   return (xs$: Stream<BrowserWindowAction>) => {
     const action$ = xsToObservable(xs$)
-    action$.subscribe(actionHander)
+    action$.subscribe(actionHandler)
     return createSource()
   }
 }

@@ -20,14 +20,14 @@ export class IpcMainSource<Output extends Obj, Input extends Obj> {
   public isolateSource = (source: IpcMainSource<Output, Input>, scope: any) => {
     return new PureIpcMainSource<Input>(
       source.getRawInput(),
-      scope
+      scope ?? undefined
     )
   }
 
   public isolateSink = (sink$: Stream<ChannelConfigToWebSink<Output>>, scope: any) => {
     return adapt(xsToObservable(sink$).pipe(map((payload) => ({
       ...payload,
-      webContentsId: scope
+      webContentsId: scope ?? undefined
     }))) as any)
   }
 
@@ -49,7 +49,7 @@ class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Obj, Input> {
     super()
     this.rawInput$ = rawInput
     this.input$ = rawInput.pipe(
-      filter(({ event }) => webContentsId === event.sender.id)
+      filter(({ event }) => typeof webContentsId === 'undefined' || webContentsId === event.sender.id)
     )
   }
 }

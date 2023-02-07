@@ -1,12 +1,17 @@
-import { type BrowserWindow } from 'electron'
+import { type BrowserWindowConstructorOptions, type BrowserWindow, type OpenDevToolsOptions } from 'electron'
 
 export interface BrowserWindowAction {
   id?: number
+  category?: string
   focus?: boolean
+  create?: { ctorOptions: BrowserWindowConstructorOptions, category?: string }
+  show?: null
+  loadURL?: string
+  openDevTools?: OpenDevToolsOptions | null
 }
 
 export type BrowserWindowActionHandler = {
-  [K in Exclude<keyof BrowserWindowAction, 'id'>]: (options: {
+  [K in Exclude<keyof BrowserWindowAction, 'id' | 'category'>]: (options: {
     payload: Required<BrowserWindowAction>[K]
     browserWindow: BrowserWindow
   }) => void
@@ -25,7 +30,12 @@ export type BrowserWindowEvent = {
   }
 }[keyof AllBrowserWindowEvents]
 
-export type BrowserWindowEventCallback = (payload: Pick<BrowserWindowEvent, 'type' | 'data'>) => void
+export type BrowserWindowEventCallback = {
+  [K in keyof AllBrowserWindowEvents]: (payload: {
+    type: K
+    data: AllBrowserWindowEvents[K]
+  }) => void
+}[keyof AllBrowserWindowEvents]
 
 export type BrowserWindowEventEmitters = {
   [K in keyof AllBrowserWindowEvents]: (

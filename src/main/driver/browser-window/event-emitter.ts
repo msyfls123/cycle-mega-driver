@@ -7,16 +7,16 @@ const emitters: BrowserWindowEventEmitters = {
   },
   blur: (browserWindow, next) => {
     browserWindow.on('blur', next)
-  }
+  },
 }
 
 export function listenToBrowserWindowEvents (browserWindow: BrowserWindow, next: BrowserWindowEventCallback) {
   for (const [key, emitter] of Object.entries(emitters)) {
     emitter(browserWindow, (data) => {
       next({
-        type: key as keyof BrowserWindowEventEmitters,
-        data
-      })
+        type: key,
+        data,
+      } as any)
     })
   }
 }
