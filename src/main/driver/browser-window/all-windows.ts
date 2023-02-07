@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import { BehaviorSubject, map, scan, tap } from 'rxjs'
+import { BehaviorSubject, ReplaySubject, connectable, map, scan, tap } from 'rxjs'
 
 export function getAllWindows () {
   interface AllWindowEvent {
@@ -40,5 +40,10 @@ export function getAllWindows () {
     map(set => Array.from(set))
   )
 
-  return windows$
+  const conn = connectable(windows$, {
+    connector: () => new ReplaySubject(1),
+  })
+  conn.connect()
+
+  return conn
 }
