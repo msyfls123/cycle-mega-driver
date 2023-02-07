@@ -9,7 +9,16 @@ import libConfigs from '../rollup.config.mjs'
 import { distDir } from './constants.mjs'
 import exampleConfigs from './rollup.config.mjs'
 
-const electron = connect.server.create()
+const electron = connect.server.create({
+    spawnOpt: {
+        env: {
+            ...process.env,
+            DEBUG_COLORS: 1,
+            FORCE_COLOR: 'true',
+            DEBUG: '*',
+        },
+    },
+})
 const args = [path.join(distDir, 'main.js')]
 
 const restart = _.debounce(() => new Promise((resolve) => {

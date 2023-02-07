@@ -18,7 +18,8 @@ import { type Observable, ReplaySubject, connectable, merge } from 'rxjs'
 import { filter, map, startWith, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
-import { run } from '@cycle/rxjs-run'
+import { setup } from '@cycle/rxjs-run'
+import debug from 'debug'
 
 import { Menu } from './component/Menu'
 import { type IPCMainConfig, type IPCRendererConfig, MenuId, TAB_MENU } from './constants'
@@ -111,7 +112,7 @@ app.whenReady().then(() => {
       }),
     }
   }
-  run(
+  const program = setup(
     isolate(main, {
       ipc: win.webContents.id,
       browser: win.id,
@@ -123,4 +124,11 @@ app.whenReady().then(() => {
       lifecycle: makeAppLifecyleDriver(),
     }
   )
+  Object.entries(program.sinks).forEach(([key, sink]: [string, Observable<unknown>]) => {
+    const log = debug(key)
+    sink.subscribe((data) => {
+      log(data)
+    })
+  })
+  program.run()
 }).catch(console.error)
