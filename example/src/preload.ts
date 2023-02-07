@@ -1,4 +1,4 @@
-import { mergeWithKey } from 'cycle-mega-driver/lib/main'
+import { mapToIpcSink } from 'cycle-mega-driver/lib/main'
 import { type IpcRendererSource, makeIpcRendererDriverNg } from 'cycle-mega-driver/lib/renderer'
 import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 import { contextBridge } from 'electron'
@@ -25,7 +25,7 @@ const main = (
     }
   })
   return {
-    ipc: mergeWithKey({
+    ipc: mapToIpcSink({
       'toggle-focus': blur$
     })
   }

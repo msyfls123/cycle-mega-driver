@@ -7,7 +7,7 @@ import {
   makeApplicationMenuDriver,
   makeBrowserWindowDriver,
   makeIpcMainDriver,
-  mergeWithKey,
+  mapToIpcSink,
   makeAppLifecyleDriver,
   type AppLifecycleSource,
 } from 'cycle-mega-driver/lib/main'
@@ -101,7 +101,7 @@ app.whenReady().then(() => {
 
     return {
       browser: merge(blurFromRenderer$, focusByMenu),
-      ipc: mergeWithKey({
+      ipc: mapToIpcSink({
         visible: visible$
       }),
       menu: menu$,
