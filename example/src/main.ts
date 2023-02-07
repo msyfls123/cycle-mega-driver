@@ -29,7 +29,7 @@ const main = (
   { browser, ipc, menu, lifecycle }:
   {
     browser: BrowserWindowSource
-    ipc: IpcMainSource<IPCMainConfig, IPCRendererConfig>
+    ipc: IpcMainSource<IPCRendererConfig>
     menu: ApplicationMenuSource<MenuId>
     lifecycle: AppLifecycleSource
   }
@@ -117,7 +117,7 @@ const main = (
     ipc: mapToIpcSink({
       visible: visible$
     }).pipe(lifecycle.whenReady),
-    menu: menu$,
+    menu: menu$.pipe(lifecycle.whenReady),
     lifecycle: intoEntries({
       state: appState$,
       isQuittingEnabled: enableQuit$,

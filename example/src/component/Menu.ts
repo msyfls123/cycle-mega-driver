@@ -2,12 +2,12 @@ import { type IpcMainSource } from 'cycle-mega-driver/lib/main'
 import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
 import { type Observable, combineLatest, map, startWith } from 'rxjs'
 
-import { type IPCMainConfig, type IPCRendererConfig, MenuId, TAB_MENU } from '../constants'
+import { type IPCRendererConfig, MenuId, TAB_MENU } from '../constants'
 
 export function Menu (
   { ipc, browserIds$ }:
   {
-    ipc: IpcMainSource<IPCMainConfig, IPCRendererConfig>
+    ipc: IpcMainSource<IPCRendererConfig>
     browserIds$: Observable<Set<number>>
   }
 ): {
