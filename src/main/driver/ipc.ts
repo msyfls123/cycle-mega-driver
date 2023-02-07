@@ -13,18 +13,18 @@ export const mapToIpcSink = <T extends Obj>(input: MapValueToObservable<T>) => {
   ) as Observable<ChannelConfigToWebSink<T>>
 }
 
-export class IpcMainSource<Output extends Obj, Input extends Obj> {
+export class IpcMainSource<Input extends Obj> {
   protected rawInput$: Subject<ChannelConfigToWebSource<Input>>
   protected input$: Observable<ChannelConfigToWebSource<Input>>
 
-  public isolateSource = (source: IpcMainSource<Output, Input>, scope: any) => {
+  public static isolateSource = <Input extends Obj>(source: IpcMainSource<Input>, scope: any) => {
     return new PureIpcMainSource<Input>(
       source.getRawInput(),
       scope ?? undefined
     )
   }
 
-  public isolateSink = (sink$: Stream<ChannelConfigToWebSink<Output>>, scope: any) => {
+  public static isolateSink = <Output extends Obj>(sink$: Stream<ChannelConfigToWebSink<Output>>, scope: any) => {
     return adapt(xsToObservable(sink$).pipe(map((payload) => ({
       ...payload,
       webContentsId: scope ?? undefined
@@ -44,7 +44,7 @@ export class IpcMainSource<Output extends Obj, Input extends Obj> {
   }
 }
 
-class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Obj, Input> {
+class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Input> {
   constructor (rawInput: Subject<ChannelConfigToWebSource<Input>>, webContentsId: number) {
     super()
     this.rawInput$ = rawInput
@@ -54,7 +54,7 @@ class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Obj, Input> {
   }
 }
 
-class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMainSource<Output, Input> {
+class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMainSource<Input> {
   private readonly output$: Observable<ChannelConfigToWebSink<Output>>
 
   public constructor (
