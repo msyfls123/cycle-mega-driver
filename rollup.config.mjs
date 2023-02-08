@@ -1,5 +1,6 @@
 import { swc } from 'rollup-plugin-swc3'
 import typescript from 'rollup-plugin-typescript2'
+import ttypescript from 'ttypescript'
 
 import commonjs from '@rollup/plugin-commonjs'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
@@ -49,7 +50,16 @@ const plugins = [
   commonjs(),
   typescript({
     // check: false,
-    useTsconfigDeclarationDir: true
+    useTsconfigDeclarationDir: true,
+    typescript: ttypescript,
+      tsconfigDefaults: {
+        compilerOptions: {
+          plugins: [
+            { "transform": "typescript-transform-paths" },
+            { "transform": "typescript-transform-paths", "afterDeclarations": true }
+          ]
+        }
+      }
   }),
   swc({
     jsc: {

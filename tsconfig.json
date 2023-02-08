@@ -13,6 +13,9 @@
         "paths": {
             "cycle-mega-driver": ["."],
             "cycle-mega-driver/*": ["./*"],
+            "@src/*": ["./src/*"],
+            "@main/*": ["./src/main/*"],
+            "@renderer/*": ["./src/renderer/*"]
         },
         "lib": [
             "ES2017",
