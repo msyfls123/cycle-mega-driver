@@ -4,11 +4,9 @@ import { type Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
 
-import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcScope, type IpcMainSourceEventPayload } from '@src/constants/ipc'
-import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries, type IpcSource } from '@src/utils/observable'
+import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcScope, type IpcMainSourceEventPayload } from '../../../constants/ipc'
+import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries } from '../../../utils/observable'
 import { attachIpcSinkScope, matchIpcScope, matchIpcSink } from './isolate'
-
-export { createIpcScope } from './isolate'
 
 export const mapToIpcSink = <T extends Obj>(input: MapValueToObservable<T>) => {
   return intoEntries(input).pipe(
@@ -20,24 +18,18 @@ export class IpcMainSource<Input extends Obj> {
   protected rawInput$: Subject<ChannelConfigToWebSource<Input>>
   protected input$: Observable<ChannelConfigToWebSource<Input>>
 
-  public constructor () {
-    Reflect.defineProperty(this, 'isolateSink', {
-      value: <Output extends Obj>(
-        sink$: Stream<ChannelConfigToWebSink<Output>>,
-        scope: IpcScope,
-      ) => {
-        return adapt(
-          xsToObservable(sink$).pipe(map((sink) => attachIpcSinkScope(sink, scope))) as any
-        ) as Stream<ChannelConfigToWebSink<Output>>
-      }
-    })
-  }
-
-  public isolateSource = <Input extends Obj>(source: IpcMainSource<Input>, scope: IpcScope) => {
+  public static isolateSource = <Input extends Obj>(source: IpcMainSource<Input>, scope: IpcScope) => {
     return new PureIpcMainSource<Input>(
       source.getRawInput(),
       scope
     )
+  }
+
+  public static isolateSink = <Output extends Obj>(
+    sink$: Stream<ChannelConfigToWebSink<Output>>,
+    scope: IpcScope,
+  ) => {
+    return adapt(xsToObservable(sink$).pipe(map((sink) => attachIpcSinkScope(sink, scope))) as any)
   }
 
   public select<K extends keyof Input>(name: K) {
@@ -45,7 +37,7 @@ export class IpcMainSource<Input extends Obj> {
       this.input$.pipe(
         filter(({ channel }) => name === channel)
       ) as any
-    ) as Observable<IpcSource<K, Input[K]>>
+    ) as Observable<ChannelConfigToWebSource<Input>>
   }
 
   private getRawInput () {
@@ -58,7 +50,7 @@ class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Input> {
     super()
     this.rawInput$ = rawInput
     this.input$ = rawInput.pipe(
-      filter(({ event }) => matchIpcScope(event.sender, scope)),
+      filter(({ event }) => matchIpcScope(event.sender, scope))
     )
   }
 }

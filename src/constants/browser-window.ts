@@ -1,8 +1,11 @@
 import { type BrowserWindowConstructorOptions, type BrowserWindow, type OpenDevToolsOptions } from 'electron'
 
-export interface BrowserWindowAction {
-  id?: number
+export interface BrowserWindowScope {
   category?: string
+  id?: number
+}
+
+export interface BrowserWindowAction extends BrowserWindowScope {
   focus?: boolean
   create?: { ctorOptions: BrowserWindowConstructorOptions, category?: string }
   show?: null
@@ -11,7 +14,7 @@ export interface BrowserWindowAction {
 }
 
 export type BrowserWindowActionHandler = {
-  [K in Exclude<keyof BrowserWindowAction, 'id' | 'category'>]: (options: {
+  [K in Exclude<keyof BrowserWindowAction, keyof BrowserWindowScope>]: (options: {
     payload: Required<BrowserWindowAction>[K]
     browserWindow: BrowserWindow
   }) => void

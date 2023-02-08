@@ -2,6 +2,7 @@ import { BrowserWindow } from 'electron'
 import { type BrowserWindowActionHandler, type BrowserWindowAction } from '../../../constants/browser-window'
 import { checkBrowserAvailable } from 'cycle-mega-driver/src/utils/browser'
 import { setCategory } from './utils'
+import { matchBrowserWindowScope } from './isolate'
 
 const handlers: BrowserWindowActionHandler = {
   create: () => {},
@@ -26,9 +27,7 @@ const handlers: BrowserWindowActionHandler = {
 const createHandler = (payload: Required<BrowserWindowAction>['create']) => {
   const { ctorOptions, category } = payload
   const win = new BrowserWindow(ctorOptions)
-  if (typeof category !== 'undefined') {
-    setCategory(win, category)
-  }
+  setCategory(win, category)
 }
 
 export function actionHandler (action: BrowserWindowAction) {
@@ -37,18 +36,24 @@ export function actionHandler (action: BrowserWindowAction) {
     return
   }
 
-  if (typeof action.id === 'undefined') {
-    console.error('You should pass `id` to invoke BrowserWindow action.\nRaw Action:\n', action)
-    return
-  }
+  // if (['id', 'category'].every(key => typeof action[key] === 'undefined')) {
+  //   console.error("You should pass either 'id' or 'category' to invoke BrowserWindow action.\nRaw Action:\n", action)
+  //   return
+  // }
 
-  const browserWindow = BrowserWindow.fromId(action.id)
-  if (!(browserWindow !== null && checkBrowserAvailable(browserWindow))) return
+  const browserWindows = BrowserWindow.getAllWindows()
+    .filter(browserWindow => (
+      browserWindow !== null &&
+      checkBrowserAvailable(browserWindow) &&
+      matchBrowserWindowScope(browserWindow, action)
+    ))
 
-  Object.entries(action).forEach(([key, payload]) => {
-    handlers[key]?.({
-      browserWindow,
-      payload,
+  for (const browserWindow of browserWindows) {
+    Object.entries(action).forEach(([key, payload]) => {
+      handlers[key]?.({
+        browserWindow,
+        payload,
+      })
     })
-  })
+  }
 }

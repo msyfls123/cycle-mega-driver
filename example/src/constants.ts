@@ -34,3 +34,7 @@ export const TAB_MENU = [
   MenuId.Tab8,
   MenuId.Tab9
 ]
+
+export enum Category {
+  Main = 'main'
+}

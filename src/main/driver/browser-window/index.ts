@@ -1,6 +1,10 @@
 import { filter, type Observable, startWith, pairwise, Subject, map } from 'rxjs'
 
-import { type BrowserWindowAction, type BrowserWindowEvent } from '../../../constants/browser-window'
+import {
+  type BrowserWindowScope,
+  type BrowserWindowAction,
+  type BrowserWindowEvent,
+} from '@src/constants/browser-window'
 import { adapt } from '@cycle/run/lib/adapt'
 import { type Stream } from 'xstream'
 import { xsToObservable } from 'cycle-mega-driver/src/utils/observable'
@@ -8,6 +12,9 @@ import { actionHandler } from './action-handler'
 import { getAllWindows } from './all-windows'
 import { listenToBrowserWindowEvents } from './event-emitter'
 import { type BrowserWindow } from 'electron'
+import { matchBrowserWindowScope, attachBrowserWindowActionScope } from './isolate'
+
+export { createBrowserWindowScope } from './isolate'
 
 interface BrowserWindowSourceShared {
   rawEvent$: Observable<BrowserWindowEvent>
@@ -20,29 +27,30 @@ export class BrowserWindowSource {
 
   public constructor (
     private readonly shared: BrowserWindowSourceShared,
-    scope?: number,
+    private readonly scope?: BrowserWindowScope,
   ) {
     if (typeof scope !== 'undefined') {
       this.event$ = shared.rawEvent$.pipe(
-        filter(({ browserWindow }) => browserWindow.id === scope)
+        filter(({ browserWindow }) => matchBrowserWindowScope(browserWindow, scope))
       )
     } else {
       this.event$ = shared.rawEvent$
     }
+
+    Reflect.defineProperty(this, 'isolateSink', {
+      value: (sink$: Stream<BrowserWindowAction>, scope: BrowserWindowScope) => {
+        return adapt(xsToObservable(sink$).pipe(
+          map((action) => attachBrowserWindowActionScope(action, scope))
+        ) as any) as Stream<BrowserWindowAction>
+      }
+    })
   }
 
-  public isolateSource = (source: BrowserWindowSource, scope: any) => {
+  public isolateSource = (source: BrowserWindowSource, scope: BrowserWindowScope) => {
     return new BrowserWindowSource(
       source.getShared(),
       scope
     )
-  }
-
-  public isolateSink = (sink$: Stream<BrowserWindowAction>, scope: any) => {
-    return adapt(xsToObservable(sink$).pipe(map((payload) => ({
-      ...payload,
-      id: payload.id ?? scope
-    }))) as any)
   }
 
   public select<K extends BrowserWindowEvent['type']>(name: K) {
@@ -52,11 +60,17 @@ export class BrowserWindowSource {
   }
 
   public allWindows () {
-    return adapt(this.shared.allWindows$ as any) as Observable<BrowserWindow[]>
+    return adapt(
+      this.shared.allWindows$.pipe(
+        map((browserWindows) => browserWindows.filter(w => matchBrowserWindowScope(w, this.scope)))
+      ) as any) as Observable<BrowserWindow[]>
   }
 
   public newWindow () {
-    return adapt(this.shared.newWindow$ as any) as Observable<BrowserWindow>
+    return adapt(
+      this.shared.newWindow$.pipe(
+        filter(w => matchBrowserWindowScope(w, this.scope))
+      ) as any) as Observable<BrowserWindow>
   }
 
   private getShared () {

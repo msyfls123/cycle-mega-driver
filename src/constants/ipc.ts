@@ -29,3 +29,9 @@ export type IpcMainSourceEventResponse<T extends Obj> = {
     channel: K
   }
 }[keyof T]
+
+export interface IpcScope {
+  category?: string
+  webContentsId?: number
+  browserWindowId?: number
+}

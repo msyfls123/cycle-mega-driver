@@ -2,6 +2,7 @@ import { adapt } from '@cycle/run/lib/adapt'
 import type { BrowserWindow, IpcMainEvent } from 'electron'
 import { Observable, catchError, filter, from, map, merge, throwError } from 'rxjs'
 import { type Stream } from 'xstream'
+import { type IpcScope } from '../constants/ipc'
 
 export type Obj = Record<string, any>
 
@@ -15,16 +16,18 @@ export type ChannelConfigToSink<T extends Obj> = {
   }
 }[keyof T]
 
+export interface IpcSource<Channel, Data> {
+  channel: Channel
+  data: Data
+  event: IpcMainEvent
+  browserWindow?: BrowserWindow
+}
+
 /**
  * renderer to main messages
  */
 export type ChannelConfigToWebSource<T extends Obj> = {
-  [K in keyof T]: {
-    channel: K
-    data: T[K]
-    event: IpcMainEvent
-    browserWindow?: BrowserWindow
-  }
+  [K in keyof T]: IpcSource<K, T[K]>
 }[keyof T]
 
 /**
@@ -34,8 +37,7 @@ export type ChannelConfigToWebSink<T extends Obj> = {
   [K in keyof T]: {
     channel: K
     data: T[K]
-    webContentsId?: number
-  }
+  } & IpcScope
 }[keyof T]
 
 export type MapValueToObservable<T extends Obj> = {
