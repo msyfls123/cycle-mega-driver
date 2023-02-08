@@ -4,8 +4,8 @@ import { type Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
 
-import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcMainSourceEventPayload } from '../../constants/ipc'
-import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries } from '../../utils/observable'
+import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcMainSourceEventPayload } from '../../../constants/ipc'
+import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries } from '../../../utils/observable'
 
 export const mapToIpcSink = <T extends Obj>(input: MapValueToObservable<T>) => {
   return intoEntries(input).pipe(
