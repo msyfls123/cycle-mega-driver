@@ -24,6 +24,12 @@ interface BrowserWindowSourceShared {
 }
 
 export class BrowserWindowSource {
+  select: <K extends BrowserWindowEvent['type']>(name: K) => Observable<BrowserWindowEvent>
+  allWindows: () => Observable<BrowserWindow[]>
+  newWindow: () => Observable<BrowserWindow>
+}
+
+class BrowserWindowSourceImpl implements BrowserWindowSource {
   private readonly event$: Observable<BrowserWindowEvent>
 
   public constructor (
@@ -47,8 +53,8 @@ export class BrowserWindowSource {
     })
   }
 
-  public isolateSource = (source: BrowserWindowSource, scope: BrowserWindowScope) => {
-    return new BrowserWindowSource(
+  public isolateSource = (source: BrowserWindowSourceImpl, scope: BrowserWindowScope) => {
+    return new BrowserWindowSourceImpl(
       source.getShared(),
       scope
     )
@@ -100,7 +106,7 @@ function createSource () {
       )
     })
   })
-  return new BrowserWindowSource({
+  return new BrowserWindowSourceImpl({
     rawEvent$: subject.asObservable(),
     allWindows$,
     newWindow$,
@@ -108,7 +114,7 @@ function createSource () {
 }
 
 export function makeBrowserWindowDriver () {
-  return (xs$: Stream<BrowserWindowAction>) => {
+  return (xs$: Stream<BrowserWindowAction>): BrowserWindowSource => {
     const action$ = xsToObservable(xs$)
     action$.subscribe(actionHandler)
     return createSource()

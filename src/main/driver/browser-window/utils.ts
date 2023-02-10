@@ -1,5 +1,9 @@
 import { BrowserWindow, type WebContents } from 'electron'
 
+export function checkBrowserAvailable (item?: BrowserWindow) {
+  return item instanceof BrowserWindow && !item.isDestroyed() && !item.webContents.isDestroyed()
+}
+
 export function getCategory (browserWindow: BrowserWindow) {
   return browserWindow.accessibleTitle
 }

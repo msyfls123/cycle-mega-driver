@@ -1,20 +1,11 @@
 import path from 'path'
 
 import {
-  type ApplicationMenuSource,
-  type BrowserWindowSource,
-  type IpcMainSource,
-  makeApplicationMenuDriver,
-  makeBrowserWindowDriver,
-  makeIpcMainDriver,
-  makeAppLifecyleDriver,
-  type AppLifecycleSource,
   createIpcScope,
   createBrowserWindowScope,
   getCategory,
 } from 'cycle-mega-driver/lib/main'
-import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
-import { intoEntries, type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
+import { intoEntries } from 'cycle-mega-driver/lib/utils/observable'
 import { type Observable, merge, of } from 'rxjs'
 import { map, withLatestFrom } from 'rxjs/operators'
 
@@ -23,26 +14,12 @@ import { setup } from '@cycle/rxjs-run'
 import debug from 'debug'
 
 import { Menu } from './component/Menu'
-import { type IPCMainConfig, type IPCRendererConfig, MenuId, TAB_MENU, Category } from './constants'
-import { type BrowserWindowAction } from 'cycle-mega-driver/lib/constants/browser-window'
-import type { AppLifecycleSink } from 'cycle-mega-driver/lib/main/driver/app-lifecycle'
+import { MenuId, TAB_MENU, Category } from './constants'
 import { Mainland } from './component/Mainland'
 import { CATEGORY_RENDERER_MAP } from './main/constants'
+import { MAIN_DRIVERS, type MainComponent } from './main/driver'
 
-const main = (
-  { browser, ipc, menu, lifecycle }:
-  {
-    browser: BrowserWindowSource
-    ipc: IpcMainSource<IPCRendererConfig>
-    menu: ApplicationMenuSource<MenuId>
-    lifecycle: AppLifecycleSource
-  }
-): {
-  browser: Observable<BrowserWindowAction>
-  ipc: Observable<ChannelConfigToSink<IPCMainConfig>>
-  menu: Observable<MenuItemOptions[]>
-  lifecycle: Observable<AppLifecycleSink>
-} => {
+const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
   // menu
   const browserIds$ = browser.allWindows().pipe(
     map((windows) => new Set(windows.map(w => w.id)))
@@ -116,13 +93,13 @@ const main = (
 
   return {
     browser: merge(
-      mainlandBrowser$,
+      ...(mainlandBrowser$ ? [mainlandBrowser$] : []),
       focusByMenu,
       create$,
       loadUrl$,
       openDevTools$,
     ).pipe(lifecycle.whenReady),
-    ipc: mainlandIpc$.pipe(lifecycle.whenReady),
+    ipc: mainlandIpc$?.pipe(lifecycle.whenReady),
     menu: menu$.pipe(lifecycle.whenReady),
     lifecycle: intoEntries({
       state: appState$,
@@ -132,12 +109,7 @@ const main = (
 }
 const program = setup(
   main,
-  {
-    browser: makeBrowserWindowDriver(),
-    ipc: makeIpcMainDriver<IPCMainConfig, IPCRendererConfig>(['visible']),
-    menu: makeApplicationMenuDriver<MenuId>(),
-    lifecycle: makeAppLifecyleDriver(),
-  }
+  MAIN_DRIVERS
 )
 Object.entries(program.sinks).forEach(([key, sink]: [string, Observable<unknown>]) => {
   const log = debug(`Sink: ${key}`)

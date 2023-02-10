@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { type BrowserWindowActionHandler, type BrowserWindowAction } from '../../../constants/browser-window'
-import { checkBrowserAvailable } from 'cycle-mega-driver/src/utils/browser'
-import { setCategory } from './utils'
+import { checkBrowserAvailable, setCategory } from './utils'
 import { matchBrowserWindowScope } from './isolate'
 
 const handlers: BrowserWindowActionHandler = {

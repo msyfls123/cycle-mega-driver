@@ -1,19 +1,9 @@
-import { type BrowserWindowAction } from 'cycle-mega-driver/lib/constants/browser-window'
-import { type BrowserWindowSource, type IpcMainSource, checkBrowserAvailable } from 'cycle-mega-driver/lib/main'
-import { type Observable, ReplaySubject, connectable, filter, map, merge } from 'rxjs'
-import { type IPCMainConfig, type IPCRendererConfig } from '../constants'
-import { mapToIpcSink, type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
+import { checkBrowserAvailable } from 'cycle-mega-driver/lib/main'
+import { ReplaySubject, connectable, filter, map, merge } from 'rxjs'
+import { mapToIpcSink } from 'cycle-mega-driver/lib/utils/observable'
+import { type MatchMain } from '../main/driver'
 
-export const Mainland = (
-  { browser, ipc }:
-  {
-    browser: BrowserWindowSource
-    ipc: IpcMainSource<IPCRendererConfig>
-  }
-): {
-  browser: Observable<BrowserWindowAction>
-  ipc: Observable<ChannelConfigToSink<IPCMainConfig>>
-} => {
+export const Mainland: MatchMain<'browser' | 'ipc'> = ({ browser, ipc }) => {
   // ipc
   const visible$ = connectable(merge(
     browser.select('blur').pipe(map(() => 'blur')),

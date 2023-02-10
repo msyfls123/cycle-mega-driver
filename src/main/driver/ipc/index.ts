@@ -11,6 +11,10 @@ import { attachIpcSinkScope, matchIpcScope, matchIpcSink } from './isolate'
 export { createIpcScope } from './isolate'
 
 export class IpcMainSource<Input extends Obj> {
+  select: <K extends keyof Input>(name: K) => Observable<IpcSource<K, Input[K]>>
+}
+
+class IpcMainSourceImpl<Input extends Obj> implements IpcMainSource<Input> {
   protected rawInput$: Subject<ChannelConfigToWebSource<Input>>
   protected input$: Observable<ChannelConfigToWebSource<Input>>
 
@@ -27,7 +31,7 @@ export class IpcMainSource<Input extends Obj> {
     })
   }
 
-  public isolateSource = <Input extends Obj>(source: IpcMainSource<Input>, scope: IpcScope) => {
+  public isolateSource = <Input extends Obj>(source: IpcMainSourceImpl<Input>, scope: IpcScope) => {
     return new PureIpcMainSource<Input>(
       source.getRawInput(),
       scope
@@ -47,7 +51,7 @@ export class IpcMainSource<Input extends Obj> {
   }
 }
 
-class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Input> {
+class PureIpcMainSource<Input extends Obj> extends IpcMainSourceImpl<Input> {
   constructor (rawInput: Subject<ChannelConfigToWebSource<Input>>, scope: IpcScope) {
     super()
     this.rawInput$ = rawInput
@@ -57,7 +61,7 @@ class PureIpcMainSource<Input extends Obj> extends IpcMainSource<Input> {
   }
 }
 
-class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMainSource<Input> {
+class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMainSourceImpl<Input> {
   private readonly output$: Observable<ChannelConfigToWebSink<Output>>
 
   public constructor (
@@ -136,7 +140,7 @@ class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMain
 }
 
 export function makeIpcMainDriver<Output extends Obj, Input extends Obj> (cached: Array<keyof Output>) {
-  return (xs$: Stream<ChannelConfigToWebSink<Output>>) => {
+  return (xs$: Stream<ChannelConfigToWebSink<Output>>): IpcMainSource<Input> => {
     const sink$ = xsToObservable(xs$)
     return new GlobalIpcMainSource<Output, Input>(sink$, cached)
   }
