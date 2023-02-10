@@ -15,6 +15,7 @@ import { type BrowserWindow } from 'electron'
 import { matchBrowserWindowScope, attachBrowserWindowActionScope } from './isolate'
 
 export { createBrowserWindowScope } from './isolate'
+export * from './utils'
 
 interface BrowserWindowSourceShared {
   rawEvent$: Observable<BrowserWindowEvent>

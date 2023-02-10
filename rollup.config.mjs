@@ -73,10 +73,10 @@ const plugins = [
 
 const main = {
   ...commonConfig,
-
   input: {
     main: 'src/main/index.ts',
     renderer: 'src/renderer/index.ts',
+    common: 'src/common.ts',
   },
   plugins: [
     ...plugins,

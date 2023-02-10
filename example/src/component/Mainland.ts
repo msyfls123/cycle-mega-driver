@@ -1,8 +1,8 @@
 import { type BrowserWindowAction } from 'cycle-mega-driver/lib/constants/browser-window'
-import { type BrowserWindowSource, type IpcMainSource, checkBrowserAvailable, mapToIpcSink } from 'cycle-mega-driver/lib/main'
+import { type BrowserWindowSource, type IpcMainSource, checkBrowserAvailable } from 'cycle-mega-driver/lib/main'
 import { type Observable, ReplaySubject, connectable, filter, map, merge } from 'rxjs'
 import { type IPCMainConfig, type IPCRendererConfig } from '../constants'
-import { type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
+import { mapToIpcSink, type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
 
 export const Mainland = (
   { browser, ipc }:

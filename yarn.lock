@@ -2,6 +2,16 @@
 # yarn lockfile v1
 
 
+"@cycle/dom@^23.1.0":
+  version "23.1.0"
+  resolved "https://mirrors.tencent.com/npm/@cycle%2fdom/-/dom-23.1.0.tgz#1e28b6d8482b5e56078c22c71f5ac84844726ed4"
+  integrity sha512-BCjSKljAzqv7hYa06UjovqmwdBXPoWcHaackcg+3WG9ZAWOPpl+HrZAFQlbtWGFwDHqZOXckxtnRXueamo52iw==
+  dependencies:
+    "@cycle/run" "^5.2.0"
+    snabbdom "^3.4.0"
+    snabbdom-selector "^5.0.0"
+    xstream "11.x"
+
 "@cycle/isolate@^5.2.0":
   version "5.2.0"
   resolved "https://mirrors.tencent.com/npm/@cycle%2fisolate/-/isolate-5.2.0.tgz#42150b2d6ffabf35e745acc8baee5184dda9c474"
@@ -114,6 +124,20 @@
     estree-walker "^2.0.2"
     glob "^8.0.3"
     is-reference "1.2.1"
+    magic-string "^0.27.0"
+
+"@rollup/plugin-html@^1.0.2":
+  version "1.0.2"
+  resolved "https://mirrors.tencent.com/npm/@rollup%2fplugin-html/-/plugin-html-1.0.2.tgz#e12573f417e38d66b2af52e072892168f5bbf105"
+  integrity sha512-jGqb45BPj5kwvb/bq1jIzUDLebsm1xmfnY1rwgTIZyjpsMyMKLuQO27n4z5qv6kZmxqxh+CBRD7d1rjAu85Uzg==
+
+"@rollup/plugin-inject@^5.0.3":
+  version "5.0.3"
+  resolved "https://mirrors.tencent.com/npm/@rollup%2fplugin-inject/-/plugin-inject-5.0.3.tgz#0783711efd93a9547d52971db73b2fb6140a67b1"
+  integrity sha512-411QlbL+z2yXpRWFXSmw/teQRMkXcAAC8aYTemc15gwJRpvEVDQwoe+N/HTFD8RFG8+88Bme9DK2V9CVm7hJdA==
+  dependencies:
+    "@rollup/pluginutils" "^5.0.1"
+    estree-walker "^2.0.2"
     magic-string "^0.27.0"
 
 "@rollup/plugin-node-resolve@^15.0.1":
@@ -3653,6 +3677,25 @@ slash@^3.0.0:
   resolved "https://mirrors.tencent.com/npm/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
+snabbdom-pragma@^2.8.0:
+  version "2.8.0"
+  resolved "https://mirrors.tencent.com/npm/snabbdom-pragma/-/snabbdom-pragma-2.8.0.tgz#7928fa90070a16f732077f93d15f6d18e27e0a08"
+  integrity sha512-ReCc8AiMksj8vWRfPQjvyji4DY6qUu3FiMfI0/mBJeRAfgOR/d5ijY+rpuMl4kee4w5fjj4pEasl2umaxOawpA==
+  dependencies:
+    extend "^3.0.0"
+
+snabbdom-selector@^5.0.0:
+  version "5.0.0"
+  resolved "https://mirrors.tencent.com/npm/snabbdom-selector/-/snabbdom-selector-5.0.0.tgz#b0d296ba61e36c84eaa6506d0a592ba23a11cdad"
+  integrity sha512-bJgpomacLM3jVhghsFxLcws8B6k+GVcnB/Af3avannj/zavIM1vLagvQHTFXzRVkf6nfxYaf/q58gekClDJoYA==
+  dependencies:
+    tree-selector "^2.1.0"
+
+snabbdom@^3.4.0:
+  version "3.5.1"
+  resolved "https://mirrors.tencent.com/npm/snabbdom/-/snabbdom-3.5.1.tgz#25f80ef15b194baea703d9d5441892e369de18e1"
+  integrity sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==
+
 snapdragon-node@^2.0.1:
   version "2.1.1"
   resolved "https://mirrors.tencent.com/npm/snapdragon-node/-/snapdragon-node-2.1.1.tgz#6c175f86ff14bdb0724563e8f3c1b021a286853b"
@@ -3949,6 +3992,11 @@ tree-kill@^1.1.0:
   version "1.2.2"
   resolved "https://mirrors.tencent.com/npm/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
+
+tree-selector@^2.1.0:
+  version "2.1.1"
+  resolved "https://mirrors.tencent.com/npm/tree-selector/-/tree-selector-2.1.1.tgz#644af6c3aa361aabdd8ae545b58f82155884fc17"
+  integrity sha512-NVFYU6YzyUHSMS7+qbhdHlBHG5P9IPjycQa+8MnIBDpq/UWEkMD+lAL/56x7Fty+mAq9SWgtg9D4flZfuOZdDg==
 
 tsconfig-paths@^3.14.1:
   version "3.14.1"
@@ -4290,7 +4338,7 @@ ws@^3.1.0:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-"xstream@10.x || 11.x", xstream@^11.7.0:
+"xstream@10.x || 11.x", xstream@11.x, xstream@^11.7.0:
   version "11.14.0"
   resolved "https://mirrors.tencent.com/npm/xstream/-/xstream-11.14.0.tgz#2c071d26b18310523b6877e86b4e54df068a9ae5"
   integrity sha512-1bLb+kKKtKPbgTK6i/BaoAn03g47PpFstlbe1BA+y3pNS/LfvcaghS5BFf9+EE1J+KwSQsEpfJvFN5GqFtiNmw==

@@ -15,7 +15,12 @@ export function getAllWindows () {
       window: win,
     })
   }
-  app.on('browser-window-created', (e, window) => { add(window) })
+  app.on('browser-window-created', (e, window) => {
+    // since accessibleTitle is not settled immediately
+    setTimeout(() => {
+      add(window)
+    })
+  })
 
   const windows$ = subject.pipe(
     tap(({ type, window }) => {

@@ -5,16 +5,10 @@ import { type Stream } from 'xstream'
 import { adapt } from '@cycle/run/lib/adapt'
 
 import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcScope, type IpcMainSourceEventPayload } from '@src/constants/ipc'
-import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type MapValueToObservable, type Obj, xsToObservable, intoEntries, type IpcSource } from '@src/utils/observable'
+import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type Obj, xsToObservable, type IpcSource } from '@src/utils/observable'
 import { attachIpcSinkScope, matchIpcScope, matchIpcSink } from './isolate'
 
 export { createIpcScope } from './isolate'
-
-export const mapToIpcSink = <T extends Obj>(input: MapValueToObservable<T>) => {
-  return intoEntries(input).pipe(
-    map(({ key, value }) => ({ channel: key, data: value }))
-  ) as Observable<ChannelConfigToWebSink<T>>
-}
 
 export class IpcMainSource<Input extends Obj> {
   protected rawInput$: Subject<ChannelConfigToWebSource<Input>>

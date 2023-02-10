@@ -6,6 +6,12 @@ import { type IpcScope } from '../constants/ipc'
 
 export type Obj = Record<string, any>
 
+export const mapToIpcSink = <T extends Obj>(input: MapValueToObservable<T>) => {
+  return intoEntries(input).pipe(
+    map(({ key, value }) => ({ channel: key, data: value }))
+  ) as Observable<ChannelConfigToWebSink<T>>
+}
+
 /**
  * raw messages between main and renderer
  */

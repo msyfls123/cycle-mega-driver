@@ -11,6 +11,7 @@ import {
   type AppLifecycleSource,
   createIpcScope,
   createBrowserWindowScope,
+  getCategory,
 } from 'cycle-mega-driver/lib/main'
 import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
 import { intoEntries, type ChannelConfigToSink } from 'cycle-mega-driver/lib/utils/observable'
@@ -26,6 +27,7 @@ import { type IPCMainConfig, type IPCRendererConfig, MenuId, TAB_MENU, Category 
 import { type BrowserWindowAction } from 'cycle-mega-driver/lib/constants/browser-window'
 import type { AppLifecycleSink } from 'cycle-mega-driver/lib/main/driver/app-lifecycle'
 import { Mainland } from './component/Mainland'
+import { CATEGORY_RENDERER_MAP } from './main/constants'
 
 const main = (
   { browser, ipc, menu, lifecycle }:
@@ -56,7 +58,7 @@ const main = (
             preload: path.join(__dirname, 'preload.js')
           }
         },
-        category: Category.Main
+        category: Category.Mainland
       },
     },
     {
@@ -73,7 +75,7 @@ const main = (
   const loadUrl$ = browser.newWindow().pipe(
     map(w => ({
       id: w.id,
-      loadURL: `about:blank#${w.id.toString()}`,
+      loadURL: CATEGORY_RENDERER_MAP[getCategory(w)] ?? `about:blank#${getCategory(w)}`,
     }))
   )
 
@@ -103,8 +105,8 @@ const main = (
   )
 
   const IsolatedMainland = isolate(Mainland, {
-    ipc: createIpcScope({ category: Category.Main }),
-    browser: createBrowserWindowScope({ category: Category.Main }),
+    ipc: createIpcScope({ category: Category.Mainland }),
+    browser: createBrowserWindowScope({ category: Category.Mainland }),
   })
 
   const {
