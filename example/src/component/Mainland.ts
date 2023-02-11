@@ -1,21 +1,23 @@
-import { checkBrowserAvailable } from 'cycle-mega-driver/lib/main'
-import { ReplaySubject, connectable, filter, map, merge } from 'rxjs'
-import { mapToIpcSink } from 'cycle-mega-driver/lib/utils/observable'
+import { ReplaySubject, connectable, map, merge } from 'rxjs'
 import { type MatchMain } from '../main/driver'
 
-export const Mainland: MatchMain<'browser' | 'ipc'> = ({ browser, ipc }) => {
+export const Mainland: MatchMain<{
+  SourceKeys: 'browser' | 'ipc'
+}> = ({ browser, ipc }) => {
   // ipc
   const visible$ = connectable(merge(
     browser.select('blur').pipe(map(() => 'blur')),
     browser.select('focus').pipe(map(() => 'focus'))
-  ), {
+  ).pipe(map(text => ipc.createSink({
+    visible: text
+  }))), {
     connector: () => new ReplaySubject(1)
   })
   visible$.connect()
 
   const toggle$ = ipc.select('toggle-focus')
   const blurFromRenderer$ = toggle$.pipe(
-    filter(({ browserWindow }) => checkBrowserAvailable(browserWindow)),
+    // filter(({ browserWindow }) => checkBrowserAvailable(browserWindow)),
     map(({ data, browserWindow }) => ({
       id: browserWindow?.id,
       focus: data,
@@ -23,9 +25,7 @@ export const Mainland: MatchMain<'browser' | 'ipc'> = ({ browser, ipc }) => {
   )
 
   return {
-    ipc: mapToIpcSink({
-      visible: visible$
-    }),
+    ipc: visible$,
     browser: merge(
       blurFromRenderer$
     )

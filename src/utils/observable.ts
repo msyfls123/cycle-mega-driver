@@ -67,7 +67,7 @@ export function adaptObservable<T> (observable: Observable<T>) {
 export type IntoEntries<T extends Obj> = {
   [K in keyof T]: {
     key: K
-    value: T[K]
+    value: Required<T>[K]
   }
 }[keyof T]
 
@@ -89,7 +89,7 @@ export const intoEntries = <T extends Obj>(input: MapValueToObservable<T>) => {
         )
       )
     )
-  ) as Observable<IntoEntries<T>>
+  ) as Observable<NonNullable<IntoEntries<T>>>
 }
 
 export function pick<T extends IntoEntries<Obj>, K extends T['key']> (name: K) {

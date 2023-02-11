@@ -1,20 +1,19 @@
-import { type IpcMainSource } from 'cycle-mega-driver/lib/main'
 import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
 import { type Observable, combineLatest, map, startWith } from 'rxjs'
 
-import { type IPCRendererConfig, MenuId, TAB_MENU } from '../constants'
+import { MenuId, TAB_MENU } from '../constants'
+import { type MatchMain } from '../main/driver'
 
-export function Menu (
-  { ipc, browserIds$ }:
-  {
-    ipc: IpcMainSource<IPCRendererConfig>
-    browserIds$: Observable<Set<number>>
-  }
-): {
-    menuTemplate: Observable<MenuItemOptions[]>
-  } {
+export const Menu: MatchMain<{
+  SourceKeys: 'ipc'
+  SinkKeys: 'menu'
+  ExtraSources: { browserIds$: Observable<Set<number>> }
+  ExtraSinks: unknown
+}> = (
+  { ipc, browserIds$ }
+) => {
   return {
-    menuTemplate: combineLatest([
+    menu: combineLatest([
       ipc.select('language').pipe(startWith({})),
       browserIds$.pipe(startWith(new Set<number>()))
     ]).pipe(

@@ -5,7 +5,6 @@ import {
   createBrowserWindowScope,
   getCategory,
 } from 'cycle-mega-driver/lib/main'
-import { intoEntries } from 'cycle-mega-driver/lib/utils/observable'
 import { type Observable, merge, of } from 'rxjs'
 import { map, withLatestFrom } from 'rxjs/operators'
 
@@ -24,7 +23,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
   const browserIds$ = browser.allWindows().pipe(
     map((windows) => new Set(windows.map(w => w.id)))
   )
-  const { menuTemplate: menu$ } = Menu({ ipc, browserIds$ })
+  const { menu: menu$ } = Menu({ ipc, browserIds$ })
 
   // browser window
   const create$ = of(
@@ -101,7 +100,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
     ).pipe(lifecycle.whenReady),
     ipc: mainlandIpc$?.pipe(lifecycle.whenReady),
     menu: menu$.pipe(lifecycle.whenReady),
-    lifecycle: intoEntries({
+    lifecycle: lifecycle.createSink({
       state: appState$,
       isQuittingEnabled: enableQuit$,
     }),

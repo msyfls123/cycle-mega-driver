@@ -10,13 +10,18 @@ import { attachIpcSinkScope, matchIpcScope, matchIpcSink } from './isolate'
 
 export { createIpcScope } from './isolate'
 
-export class IpcMainSource<Input extends Obj> {
-  select: <K extends keyof Input>(name: K) => Observable<IpcSource<K, Input[K]>>
+type OneEvent<Events extends Obj> = {
+  [K in keyof Events]: Pick<Events, K>
+}[keyof Events]
+
+export class IpcMainSource<Source extends Obj, Sink extends Obj> {
+  select: <K extends keyof Source>(name: K) => Observable<IpcSource<K, Source[K]>>
+  createSink: (data: OneEvent<Sink>) => ChannelConfigToWebSink<Sink>
 }
 
-class IpcMainSourceImpl<Input extends Obj> implements IpcMainSource<Input> {
-  protected rawInput$: Subject<ChannelConfigToWebSource<Input>>
-  protected input$: Observable<ChannelConfigToWebSource<Input>>
+class IpcMainSourceImpl<Source extends Obj, Sink extends Obj> implements IpcMainSource<Source, Sink> {
+  protected rawInput$: Subject<ChannelConfigToWebSource<Source>>
+  protected input$: Observable<ChannelConfigToWebSource<Source>>
 
   public constructor () {
     Reflect.defineProperty(this, 'isolateSink', {
@@ -31,19 +36,27 @@ class IpcMainSourceImpl<Input extends Obj> implements IpcMainSource<Input> {
     })
   }
 
-  public isolateSource = <Input extends Obj>(source: IpcMainSourceImpl<Input>, scope: IpcScope) => {
-    return new PureIpcMainSource<Input>(
+  public isolateSource = (source: IpcMainSourceImpl<Source, Sink>, scope: IpcScope) => {
+    return new PureIpcMainSource<Source, Sink>(
       source.getRawInput(),
       scope
     )
   }
 
-  public select<K extends keyof Input>(name: K) {
+  public select<K extends keyof Source>(name: K) {
     return adapt(
       this.input$.pipe(
         filter(({ channel }) => name === channel)
       ) as any
-    ) as Observable<IpcSource<K, Input[K]>>
+    ) as Observable<IpcSource<K, Source[K]>>
+  }
+
+  public createSink (event: Partial<Sink>): ChannelConfigToWebSink<Sink> {
+    const key: keyof Sink = Object.keys(event)[0]
+    return {
+      data: event[key] as Sink[keyof Sink],
+      channel: key,
+    }
   }
 
   private getRawInput () {
@@ -51,8 +64,8 @@ class IpcMainSourceImpl<Input extends Obj> implements IpcMainSource<Input> {
   }
 }
 
-class PureIpcMainSource<Input extends Obj> extends IpcMainSourceImpl<Input> {
-  constructor (rawInput: Subject<ChannelConfigToWebSource<Input>>, scope: IpcScope) {
+class PureIpcMainSource<Source extends Obj, Sink extends Obj> extends IpcMainSourceImpl<Source, Sink> {
+  constructor (rawInput: Subject<ChannelConfigToWebSource<Source>>, scope: IpcScope) {
     super()
     this.rawInput$ = rawInput
     this.input$ = rawInput.pipe(
@@ -61,12 +74,12 @@ class PureIpcMainSource<Input extends Obj> extends IpcMainSourceImpl<Input> {
   }
 }
 
-class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMainSourceImpl<Input> {
-  private readonly output$: Observable<ChannelConfigToWebSink<Output>>
+class GlobalIpcMainSource<Source extends Obj, Sink extends Obj> extends IpcMainSourceImpl<Source, Sink> {
+  private readonly output$: Observable<ChannelConfigToWebSink<Sink>>
 
   public constructor (
-    sink$: Observable<ChannelConfigToWebSink<Output>>,
-    cached: Array<keyof Output>
+    sink$: Observable<ChannelConfigToWebSink<Sink>>,
+    cached: Array<keyof Sink>
   ) {
     super()
 
@@ -98,7 +111,7 @@ class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMain
     ipcMain.off(IPC_RENDERER_CHANNEL, this.handleIpcMessageFromRenderer)
   }
 
-  private readonly handleIpcMessageFromRenderer = (event: IpcMainEvent, payload: ChannelConfigToSink<Input>) => {
+  private readonly handleIpcMessageFromRenderer = (event: IpcMainEvent, payload: ChannelConfigToSink<Source>) => {
     this.rawInput$.next({
       event,
       channel: payload.channel,
@@ -107,7 +120,7 @@ class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMain
     })
   }
 
-  private readonly handleSubscribe = (event: IpcMainEvent, payload: IpcMainSourceEventPayload<Output>) => {
+  private readonly handleSubscribe = (event: IpcMainEvent, payload: IpcMainSourceEventPayload<Sink>) => {
     const { uuid, channels, type } = payload
     if (type === 'subscribe') {
       const subscription = this.output$.pipe(
@@ -140,8 +153,8 @@ class GlobalIpcMainSource<Output extends Obj, Input extends Obj> extends IpcMain
 }
 
 export function makeIpcMainDriver<Output extends Obj, Input extends Obj> (cached: Array<keyof Output>) {
-  return (xs$: Stream<ChannelConfigToWebSink<Output>>): IpcMainSource<Input> => {
+  return (xs$: Stream<ChannelConfigToWebSink<Output>>): IpcMainSource<Input, Output> => {
     const sink$ = xsToObservable(xs$)
-    return new GlobalIpcMainSource<Output, Input>(sink$, cached)
+    return new GlobalIpcMainSource<Input, Output>(sink$, cached)
   }
 }

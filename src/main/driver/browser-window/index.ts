@@ -27,6 +27,7 @@ export class BrowserWindowSource {
   select: <K extends BrowserWindowEvent['type']>(name: K) => Observable<BrowserWindowEvent>
   allWindows: () => Observable<BrowserWindow[]>
   newWindow: () => Observable<BrowserWindow>
+  createSink: (action: BrowserWindowAction) => BrowserWindowAction
 }
 
 class BrowserWindowSourceImpl implements BrowserWindowSource {
@@ -78,6 +79,10 @@ class BrowserWindowSourceImpl implements BrowserWindowSource {
       this.shared.newWindow$.pipe(
         filter(w => matchBrowserWindowScope(w, this.scope))
       ) as any) as Observable<BrowserWindow>
+  }
+
+  public createSink (action: BrowserWindowAction) {
+    return action
   }
 
   private getShared () {

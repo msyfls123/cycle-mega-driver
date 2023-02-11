@@ -1,6 +1,6 @@
 import { makeBrowserWindowDriver, makeIpcMainDriver, makeApplicationMenuDriver, makeAppLifecyleDriver } from 'cycle-mega-driver/lib/main'
 import { type IPCMainConfig, type IPCRendererConfig, type MenuId } from '../constants'
-import { type PickComponent, pickDrivers, type CustomMain } from 'cycle-mega-driver/lib/utils/cyclejs'
+import { type PickComponent, type CustomMain } from 'cycle-mega-driver/lib/utils/cyclejs'
 
 export const MAIN_DRIVERS = {
   browser: makeBrowserWindowDriver(),
@@ -12,5 +12,9 @@ export const MAIN_DRIVERS = {
 type MainDrivers = typeof MAIN_DRIVERS
 
 export type MainComponent = CustomMain<MainDrivers>
-export type MatchMain<T extends keyof MainDrivers> = PickComponent<MainDrivers, T>
-export const matchDrivers = <T extends keyof MainDrivers>(keys: T[]) => pickDrivers(MAIN_DRIVERS, keys)
+export type MatchMain<Options extends {
+  SourceKeys: keyof MainDrivers
+  SinkKeys?: keyof MainDrivers
+  ExtraSources?: unknown
+  ExtraSinks?: unknown
+}> = PickComponent<MainDrivers, Options>

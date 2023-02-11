@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { adaptObservable, xsToObservable, type IntoEntries, pick } from '../../utils/observable'
+import { adaptObservable, xsToObservable, type IntoEntries, pick, type MapValueToObservable, intoEntries } from '../../utils/observable'
 import { type Observable, fromEvent, withLatestFrom, startWith, delayWhen, connectable, ReplaySubject } from 'rxjs'
 
 import { type Stream } from 'xstream'
@@ -42,6 +42,10 @@ export class AppLifecycleSource {
   public whenReady = <T>(observable: Observable<T>) => observable.pipe(
     delayWhen(() => this.innerReady$)
   )
+
+  public createSink (input: MapValueToObservable<Partial<AppLifecycleAction>>): Observable<AppLifecycleSink> {
+    return intoEntries(input)
+  }
 
   constructor (sink$: Observable<AppLifecycleSink>) {
     const state$ = sink$.pipe(pick('state'), startWith('default' as const))
