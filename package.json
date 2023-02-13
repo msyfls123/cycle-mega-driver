@@ -1,6 +1,6 @@
 {
   "name": "cycle-mega-driver",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Cycle.js Driver for Making Electron Great Again.",
   "main": "dist/index.js",
   "module": "lib/index.js",
