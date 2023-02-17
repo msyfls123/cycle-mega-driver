@@ -1,4 +1,4 @@
-import { type BrowserWindowEventEmitters, type BrowserWindowEventCallback } from 'cycle-mega-driver/src/constants/browser-window'
+import { type BrowserWindowEventEmitters, type BrowserWindowEventCallback } from '@src/constants/browser-window'
 import { type BrowserWindow } from 'electron'
 
 const emitters: BrowserWindowEventEmitters = {

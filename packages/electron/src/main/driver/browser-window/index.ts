@@ -4,6 +4,7 @@ import {
   type BrowserWindowScope,
   type BrowserWindowAction,
   type BrowserWindowEvent,
+  type BrowserWindowEventCallback,
 } from '@src/constants/browser-window'
 import { adapt } from '@cycle/run/lib/adapt'
 import { type Stream } from 'xstream'
@@ -101,7 +102,7 @@ function createSource () {
     diff.forEach(browserWindow => {
       listenToBrowserWindowEvents(
         browserWindow,
-        ({ type, data }) => {
+        ({ type, data }: Parameters<BrowserWindowEventCallback>[0]) => {
           subject.next({
             type,
             data,

@@ -1,0 +1,34 @@
+{
+  "name": "@cycle-mega-driver/electron",
+  "version": "0.0.0",
+  "description": "Electron drivers for making development painless.",
+  "keywords": [
+    "electron",
+    "cyclejs"
+  ],
+  "author": "msyfls123 <msyfls123@gmail.com>",
+  "homepage": "https://github.com/msyfls123/cycle-mega-driver#readme",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "lib/index.js",
+  "files": [
+    "lib/",
+    "dist/",
+    "example/dist/"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist lib example/dist",
+    "build": "rollup -c rollup.config.mjs",
+    "eslint": "eslint ./src"
+  },
+  "bugs": {
+    "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
+  }
+}

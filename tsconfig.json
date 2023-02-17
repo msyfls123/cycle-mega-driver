@@ -11,11 +11,7 @@
         "skipLibCheck": true,
         "strictNullChecks": true,
         "paths": {
-            "cycle-mega-driver": ["."],
-            "cycle-mega-driver/*": ["./*"],
-            "@src/*": ["./src/*"],
-            "@main/*": ["./src/main/*"],
-            "@renderer/*": ["./src/renderer/*"]
+            "@cycle-mega-driver/*": ["./packages/*"],
         },
         "lib": [
             "ES2017",
@@ -26,13 +22,11 @@
         ],
     },
     "include": [
-        "src/**/*",
-        "lib/**/*",
-        "node_modules/**/*"
+      "node_modules/**/*"
     ],
     "exclude": [
-        "dist/**/*",
-        "lib/**/*",
-        "node_modules"
-    ]
+      "node_modules",
+      "rollup.config.mjs"
+    ],
+    "compileOnSave": false
 }

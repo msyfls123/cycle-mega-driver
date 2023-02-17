@@ -4,7 +4,7 @@ import {
   createIpcScope,
   createBrowserWindowScope,
   getCategory,
-} from 'cycle-mega-driver/lib/main'
+} from '@cycle-mega-driver/electron/lib/main'
 import { type Observable, merge, of } from 'rxjs'
 import { map, withLatestFrom } from 'rxjs/operators'
 

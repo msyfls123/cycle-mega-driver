@@ -9,7 +9,7 @@ export function getAllWindows () {
   const existed = BrowserWindow.getAllWindows()
   const subject = new Subject<AllWindowEvent>()
 
-  const add = (win) => {
+  const add = (win: BrowserWindow) => {
     subject.next({
       type: 'add',
       window: win,

@@ -1,7 +1,7 @@
-import { isAutoScope } from 'cycle-mega-driver/src/utils/cyclejs'
 import type { BrowserWindow } from 'electron'
 
 import type { BrowserWindowAction, BrowserWindowScope } from '@src/constants/browser-window'
+import { isAutoScope } from '@src/utils/cyclejs'
 
 import { getCategory } from './utils'
 

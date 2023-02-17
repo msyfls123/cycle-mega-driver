@@ -1,6 +1,6 @@
-import { makeBrowserWindowDriver, makeIpcMainDriver, makeApplicationMenuDriver, makeAppLifecyleDriver } from 'cycle-mega-driver/lib/main'
+import { makeBrowserWindowDriver, makeIpcMainDriver, makeApplicationMenuDriver, makeAppLifecyleDriver } from '@cycle-mega-driver/electron/lib/main'
 import { type IPCMainConfig, type IPCRendererConfig, type MenuId } from '../constants'
-import { type PickComponent, type CustomMain } from 'cycle-mega-driver/lib/utils/cyclejs'
+import { type PickComponent, type CustomMain } from '@cycle-mega-driver/electron/lib/utils/cyclejs'
 
 export const MAIN_DRIVERS = {
   browser: makeBrowserWindowDriver(),

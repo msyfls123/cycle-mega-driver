@@ -1,4 +1,4 @@
-import { type MenuItemOptions } from 'cycle-mega-driver/lib/main/driver/application-menu'
+import { type MenuItemOptions } from '@cycle-mega-driver/electron/lib/main/driver/application-menu'
 import { type Observable, combineLatest, map, startWith } from 'rxjs'
 
 import { MenuId, TAB_MENU } from '../constants'

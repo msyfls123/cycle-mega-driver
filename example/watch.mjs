@@ -5,7 +5,7 @@ import gulp from 'gulp'
 import _ from 'lodash'
 import { watch } from 'rollup'
 
-import libConfigs from '../rollup.config.mjs'
+import libConfigs from '../packages/electron/rollup.config.mjs'
 import { distDir } from './constants.mjs'
 import exampleConfigs from './rollup.config.mjs'
 
@@ -59,4 +59,7 @@ function watchCompile (configs) {
   })
 }
 
-watchCompile([...libConfigs, ...exampleConfigs])
+watchCompile([
+  ...libConfigs,
+  ...exampleConfigs
+])

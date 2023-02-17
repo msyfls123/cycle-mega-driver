@@ -1,1 +1,1 @@
-import 'cycle-mega-driver/dist/preload'
+import '@cycle-mega-driver/electron/dist/preload'

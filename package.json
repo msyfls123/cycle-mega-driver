@@ -1,6 +1,7 @@
 {
   "name": "cycle-mega-driver",
   "version": "0.4.0",
+  "private": "true",
   "description": "Cycle.js Driver for Making Electron Great Again.",
   "main": "dist/index.js",
   "module": "lib/index.js",
@@ -32,11 +33,13 @@
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "gulp": "^4.0.2",
+    "lerna": "^6.5.1",
     "lodash": "^4.17.21",
     "rollup": "^3.9.0",
     "rollup-plugin-swc3": "^0.7.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "rxjs": "^7.8.0",
+    "snabbdom-jsx": "^0.4.2",
     "snabbdom-pragma": "^2.8.0",
     "tslib": "^2.4.1",
     "ttypescript": "^1.5.15",
@@ -44,15 +47,18 @@
     "typescript-transform-paths": "^3.4.6"
   },
   "scripts": {
-    "clean": "rimraf dist lib example/dist",
-    "build": "rollup -c rollup.config.mjs",
+    "clean": "lerna exec -- npm run clean",
+    "build": "lerna exec -- npm run build",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
     "example": "rollup -c example/rollup.config.mjs",
-    "eslint": "eslint ./src ./example/src"
+    "electron": "rollup -c packages/electron/rollup.config.mjs",
+    "eslint": "lerna exec -- npm run eslint"
   },
   "peerDependencies": {
     "electron": "^19"
   },
-  "dependencies": {}
+  "workspaces": [
+    "packages/*"
+  ]
 }

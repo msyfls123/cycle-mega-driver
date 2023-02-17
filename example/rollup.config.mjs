@@ -7,7 +7,7 @@ import html from '@rollup/plugin-html'
 import inject from '@rollup/plugin-inject'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
-import { distDir, srcDir } from './constants.mjs'
+import { distDir, exampleDir, srcDir } from './constants.mjs'
 import rendererConfig from './src/entry.js'
 
 const { RENDERER_ENTRY } = rendererConfig
@@ -20,6 +20,7 @@ const plugins = [
   }),
   commonjs(),
   swc({
+    tsconfig: path.join(exampleDir, 'tsconfig.json'),
     jsc: {
       parser: {
         syntax: 'typescript'

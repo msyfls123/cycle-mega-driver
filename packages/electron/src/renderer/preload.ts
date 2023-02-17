@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { type IpcRendererEvent } from 'electron/renderer'
 
 import { IPC_INTERCEPTOR, IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcMainSourceEventResponse } from '../constants/ipc'
 
@@ -16,7 +17,7 @@ export const ipcInterceptor = {
       channels: [channel],
       uuid: id
     })
-    const handler = (event, res: IpcMainSourceEventResponse<any>) => {
+    const handler = (event: IpcRendererEvent, res: IpcMainSourceEventResponse<any>) => {
       if (!(res.channel === channel && res.uuid === id)) return
       callback(res)
     }

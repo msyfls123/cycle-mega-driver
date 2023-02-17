@@ -48,11 +48,13 @@ export function actionHandler (action: BrowserWindowAction) {
     ))
 
   for (const browserWindow of browserWindows) {
-    Object.entries(action).forEach(([key, payload]) => {
-      handlers[key]?.({
-        browserWindow,
-        payload,
+    Object.entries(action).forEach(
+      <T extends keyof BrowserWindowActionHandler>
+      ([key, payload]: [T, BrowserWindowAction[T]]) => {
+        handlers[key]?.({
+          browserWindow,
+          payload: payload as Required<BrowserWindowAction>[T],
+        })
       })
-    })
   }
 }
