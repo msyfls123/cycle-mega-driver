@@ -7,7 +7,7 @@ import {
 } from '@src/constants/browser-window'
 import { adapt } from '@cycle/run/lib/adapt'
 import { type Stream } from 'xstream'
-import { xsToObservable } from 'cycle-mega-driver/src/utils/observable'
+import { xsToObservable } from '@src/utils/observable'
 import { actionHandler } from './action-handler'
 import { getAllWindows } from './all-windows'
 import { listenToBrowserWindowEvents } from './event-emitter'

@@ -1,4 +1,4 @@
-import { xsToObservable } from 'cycle-mega-driver/src/utils/observable'
+import { xsToObservable } from '@src/utils/observable'
 import { type BrowserWindow, type KeyboardEvent, Menu, type MenuItem, type MenuItemConstructorOptions } from 'electron'
 import { type Observable, Subject, filter } from 'rxjs'
 import { type Stream } from 'xstream'
