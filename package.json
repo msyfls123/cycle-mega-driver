@@ -49,6 +49,8 @@
   "scripts": {
     "clean": "lerna exec -- npm run clean",
     "build": "lerna exec -- npm run build",
+    "version": "lerna version",
+    "publish": "lerna publish",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
     "example": "rollup -c example/rollup.config.mjs",
