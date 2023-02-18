@@ -28,7 +28,7 @@ jobs:
         run: |
           npm config set //registry.npmjs.org/:always-auth=true
           npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-          npm run publish --yes
+          yarn run publish --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: GitHub Release
