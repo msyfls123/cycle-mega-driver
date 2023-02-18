@@ -6,6 +6,8 @@ on:
       - "v*"
 
 jobs:
+  call-workflow-check:
+    uses: ./.github/workflows/check.yml
   release:
     runs-on: ubuntu-latest
     steps:
@@ -22,10 +24,13 @@ jobs:
       - name: Build
         run: |
           npm run build
-      - name: NPM Publish
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: |
+          npm config set //registry.npmjs.org/:always-auth=true
+          npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: GitHub Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

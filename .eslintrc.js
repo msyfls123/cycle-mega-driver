@@ -26,5 +26,6 @@ module.exports = {
   rules: {
     semi: ['error', 'never'],
     'comma-dangle': 'off',
+    'multiline-ternary': 'off'
   }
 }

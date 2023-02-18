@@ -26,11 +26,16 @@
   },
   "scripts": {
     "clean": "rimraf dist lib example/dist",
-    "build": "rollup -c rollup.config.mjs",
-    "eslint": "eslint ./src"
+    "eslint": "eslint ./src",
+    "tsc": "tsc --noEmit",
+    "build": "rollup -c rollup.config.mjs"
   },
   "bugs": {
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
-  "gitHead": "4641ed348e9551f89af562e4a661d1cab533e778"
+  "peerDependencies": {
+    "electron": "^19",
+    "rxjs": "^7.8.0",
+    "@cycle/rxjs-run": "^10.5.0"
+  }
 }

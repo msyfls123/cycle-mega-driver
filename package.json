@@ -25,6 +25,7 @@
     "@swc/core": "^1.3.24",
     "@types/lodash": "^4.14.191",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "cross-env": "^7.0.3",
     "electron": "^19",
     "electron-connect": "^0.6.3",
     "eslint": "^8.0.1",
@@ -36,6 +37,7 @@
     "lerna": "^6.5.1",
     "lodash": "^4.17.21",
     "rollup": "^3.9.0",
+    "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-swc3": "^0.7.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "rxjs": "^7.8.0",
@@ -47,15 +49,16 @@
     "typescript-transform-paths": "^3.4.6"
   },
   "scripts": {
-    "clean": "lerna exec -- npm run clean",
-    "build": "lerna exec -- npm run build",
+    "clean": "lerna run clean",
+    "eslint": "lerna run eslint",
+    "type-check": "lerna run tsc",
+    "build": "cross-env NODE_ENV=production lerna run build",
     "version": "lerna version",
     "publish": "lerna publish",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
     "example": "rollup -c example/rollup.config.mjs",
-    "electron": "rollup -c packages/electron/rollup.config.mjs",
-    "eslint": "lerna exec -- npm run eslint"
+    "electron": "rollup -c packages/electron/rollup.config.mjs"
   },
   "peerDependencies": {
     "electron": "^19"

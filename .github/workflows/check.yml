@@ -1,11 +1,10 @@
-name: CI
+name: Check ESLint and Types
 
-on: push
+on:
+  workflow_call:
 
 jobs:
-  call-workflow-check:
-    uses: ./.github/workflows/check.yml
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
@@ -18,6 +17,9 @@ jobs:
       - name: Install Dependencies
         run: |
           npx yarn --ci --prefer-offline
-      - name: Build
+      - name: Run ESLint
         run: |
-          npm run build
+          npm run eslint
+      - name: Run Type Check
+        run: |
+          npm run type-check

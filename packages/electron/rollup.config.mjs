@@ -1,6 +1,7 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import autoExternal from 'rollup-plugin-auto-external'
 import { swc } from 'rollup-plugin-swc3'
 import typescript from 'rollup-plugin-typescript2'
 import ttypescript from 'ttypescript'
@@ -14,28 +15,20 @@ const srcDir = path.join(__dirname, 'src')
 const distDir = path.join(__dirname, 'dist')
 const libDir = path.join(__dirname, 'lib')
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const commonConfig = {
   output: [
-    {
+    ...(isProduction ? [{
       dir: distDir,
       format: 'cjs',
-      globals: {
-        electron: 'require("electron")',
-      },
-    },
+    }] : []),
     {
       dir: libDir,
       format: 'es',
       preserveModules: true,
       preserveModulesRoot: srcDir,
-      hoistTransitiveImports: false,
-      globals: {
-        electron: 'require("electron")',
-      },
     }
-  ],
-  external: [
-    'electron',
   ],
 }
 
@@ -48,24 +41,24 @@ const preloadConfig = {
       electron: 'require("electron")',
     },
   },
-  external: [
-    'electron',
-  ],
 }
 
 const plugins = [
+  autoExternal({
+    packagePath: path.join(__dirname, 'package.json'),
+  }),
   nodeResolve({
     preferBuiltins: true,
   }),
   commonjs(),
   typescript({
-    // check: false,
+    check: false,
     useTsconfigDeclarationDir: true,
     typescript: ttypescript,
     tsconfig: path.join(__dirname, 'tsconfig.json'),
     tsconfigDefaults: {
       compilerOptions: {
-        // rootDir: srcDir,
+        emitDeclarationOnly: true,
         plugins: [
           { transform: 'typescript-transform-paths' },
           { transform: 'typescript-transform-paths', afterDeclarations: true }
