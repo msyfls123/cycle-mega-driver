@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/electron",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Electron drivers for making development painless.",
   "keywords": [
     "electron",
