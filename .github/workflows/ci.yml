@@ -1,6 +1,9 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches:
+      - "*"
 
 jobs:
   call-workflow-check:
@@ -20,4 +23,4 @@ jobs:
           npx yarn --ci --prefer-offline
       - name: Build
         run: |
-          npm run build
+          npm run build --yes

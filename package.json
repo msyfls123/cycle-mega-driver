@@ -54,7 +54,7 @@
     "type-check": "lerna run tsc",
     "build": "cross-env NODE_ENV=production lerna run build",
     "version": "lerna version",
-    "publish": "lerna publish",
+    "publish": "lerna publish from-package",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
     "example": "rollup -c example/rollup.config.mjs",
