@@ -23,4 +23,4 @@ jobs:
           npx yarn --ci --prefer-offline
       - name: Build
         run: |
-          npx yarn run build --yes
+          npm run build
