@@ -23,6 +23,7 @@
     },
     "include": [
       "example/src/**/*",
+      "template/**/*.mjs",
       "node_modules/**/*"
     ],
     "exclude": [
