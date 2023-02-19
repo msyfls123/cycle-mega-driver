@@ -1,0 +1,41 @@
+{
+  "name": "@cycle-mega-driver/database",
+  "version": "0.1.12",
+  "description": "Cyclejs bingdings for abstract-level database.",
+  "keywords": [
+    "cyclejs",
+    "level",
+    "database"
+  ],
+  "author": "msyfls123 <msyfls123@gmail.com>",
+  "homepage": "https://github.com/msyfls123/cycle-mega-driver#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist lib",
+    "eslint": "eslint ./src",
+    "tsc": "tsc --noEmit",
+    "build": "rollup -c rollup.config.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
+  },
+  "dependencies": {
+    "rxdb": "^14.0.4",
+    "rxjs": "^7.8.0"
+  }
+}
