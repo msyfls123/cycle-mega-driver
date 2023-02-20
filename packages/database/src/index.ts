@@ -1,20 +1,13 @@
-// import pouchAdapter from 'pouchdb-adapter-leveldb'
-// import {
-//   addPouchPlugin,
-//   getRxStoragePouch
-// } from 'rxdb/plugins/pouchdb'
-// import { createRxDatabase, getRxStorage } from 'rxdb'
+import pouchLevelDB from 'pouchdb-adapter-leveldb'
+import RxPouch from 'rx-pouch'
+import type RxPouchDatabase from 'rx-pouch/dist/Db'
 
-// import leveldown from 'leveldown'
+RxPouch.plugin(pouchLevelDB)
 
-// addPouchPlugin(pouchAdapter)
-
-// export async function createDatabase () {
-//   const database = await createRxDatabase({
-//     name: 'mydatabase',
-//     storage: getRxStoragePouch(leveldown)
-//   })
-// }
-export function makeDatabaseDriver () {
-
+export function getDatabase (name: string): RxPouchDatabase {
+  const db = new RxPouch(name) as RxPouchDatabase
+  db.changes().change$.subscribe((data) => {
+    console.log('changes', data)
+  })
+  return db
 }

@@ -19,6 +19,7 @@
     "dist"
   ],
   "publishConfig": {
+    "registry": "https://registry.npmjs.org",
     "access": "public"
   },
   "repository": {
@@ -35,7 +36,12 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
-    "rxdb": "^14.0.4",
+    "leveldown": "^6.1.1",
+    "pouchdb-adapter-leveldb": "^8.0.1",
+    "rx-pouch": "^0.6.9",
     "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@types/pouchdb-adapter-leveldb": "^6.1.3"
   }
 }

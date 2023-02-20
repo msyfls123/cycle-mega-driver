@@ -13,8 +13,7 @@
   "module": "lib/index.js",
   "files": [
     "lib/",
-    "dist/",
-    "example/dist/"
+    "dist/"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
@@ -25,7 +24,7 @@
     "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
   },
   "scripts": {
-    "clean": "rimraf dist lib example/dist",
+    "clean": "rimraf dist lib",
     "eslint": "eslint ./src",
     "tsc": "tsc --noEmit",
     "build": "rollup -c rollup.config.mjs"
