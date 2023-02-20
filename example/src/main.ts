@@ -6,7 +6,7 @@ import {
   getCategory,
 } from '@cycle-mega-driver/electron/lib/main'
 import { type Observable, merge, of } from 'rxjs'
-import { map, withLatestFrom } from 'rxjs/operators'
+import { map, take, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
 import { setup } from '@cycle/rxjs-run'
@@ -80,6 +80,19 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
     map(({ menuItem }) => menuItem.checked)
   )
 
+  const userData$ = lifecycle.paths.userData.pipe(
+    take(1),
+    map((origin) => {
+      const newPath = path.join(origin, 'cycle-mega-driver')
+      return { name: 'userData' as const, path: newPath }
+    })
+  )
+
+  lifecycle.paths.userData.pipe(
+    lifecycle.untilReady,
+  ).subscribe(debug('userdata dir'))
+
+  // components
   const IsolatedMainland = isolate(Mainland, {
     ipc: createIpcScope({ category: Category.Mainland }),
     browser: createBrowserWindowScope({ category: Category.Mainland }),
@@ -103,6 +116,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
     lifecycle: lifecycle.createSink({
       state: appState$,
       isQuittingEnabled: enableQuit$,
+      setPath: userData$,
     }),
   }
 }
