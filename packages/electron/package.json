@@ -32,9 +32,11 @@
   "bugs": {
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@cycle/rxjs-run": "^10.5.0",
-    "electron": "^19",
+    "electron": "^19"
+  },
+  "dependencies": {
     "rxjs": "^7.8.0"
   }
 }

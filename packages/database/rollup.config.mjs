@@ -41,17 +41,12 @@ const plugins = [
   }),
   commonjs(),
   typescript({
-    check: false,
     useTsconfigDeclarationDir: true,
     typescript: ttypescript,
     tsconfig: path.join(__dirname, 'tsconfig.json'),
     tsconfigDefaults: {
       compilerOptions: {
         emitDeclarationOnly: true,
-        plugins: [
-          { transform: 'typescript-transform-paths' },
-          { transform: 'typescript-transform-paths', afterDeclarations: true }
-        ]
       }
     }
   }),
