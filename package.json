@@ -59,7 +59,7 @@
     "publish": "lerna publish from-package --yes",
     "watch": "node ./example/watch.mjs",
     "watch-win": "chcp 65001 && npm run watch",
-    "watch-packages": "lerna watch -- lerna run build-dev --scope=\\$LERNA_PACKAGE_NAME",
+    "watch-packages": "lerna watch -- lerna run build --scope=\\$LERNA_PACKAGE_NAME",
     "example": "rollup -c example/rollup.config.mjs",
     "run-example": "electron example/dist/main.js"
   },

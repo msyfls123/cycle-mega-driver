@@ -1,4 +1,4 @@
-import { filter, type Observable, startWith, pairwise, Subject, map } from 'rxjs'
+import { filter, type Observable, startWith, pairwise, Subject, map, delayWhen, from } from 'rxjs'
 
 import {
   type BrowserWindowScope,
@@ -12,7 +12,7 @@ import { xsToObservable } from '@src/utils/observable'
 import { actionHandler } from './action-handler'
 import { getAllWindows } from './all-windows'
 import { listenToBrowserWindowEvents } from './event-emitter'
-import { type BrowserWindow } from 'electron'
+import { app, type BrowserWindow } from 'electron'
 import { matchBrowserWindowScope, attachBrowserWindowActionScope } from './isolate'
 
 export { createBrowserWindowScope } from './isolate'
@@ -121,7 +121,9 @@ function createSource () {
 
 export function makeBrowserWindowDriver () {
   return (xs$: Stream<BrowserWindowAction>): BrowserWindowSource => {
-    const action$ = xsToObservable(xs$)
+    const action$ = xsToObservable(xs$).pipe(
+      delayWhen(() => from(app.whenReady()))
+    )
     action$.subscribe(actionHandler)
     return createSource()
   }

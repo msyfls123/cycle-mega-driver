@@ -110,9 +110,9 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
       create$,
       loadUrl$,
       openDevTools$,
-    ).pipe(lifecycle.whenReady),
-    ipc: mainlandIpc$?.pipe(lifecycle.whenReady),
-    menu: menu$.pipe(lifecycle.whenReady),
+    ),
+    ipc: mainlandIpc$,
+    menu: menu$,
     lifecycle: lifecycle.createSink({
       state: appState$,
       isQuittingEnabled: enableQuit$,

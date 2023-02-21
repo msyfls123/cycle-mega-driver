@@ -1,6 +1,6 @@
 import { xsToObservable } from '@src/utils/observable'
-import { type BrowserWindow, type KeyboardEvent, Menu, type MenuItem, type MenuItemConstructorOptions } from 'electron'
-import { type Observable, Subject, filter } from 'rxjs'
+import { type BrowserWindow, type KeyboardEvent, Menu, type MenuItem, type MenuItemConstructorOptions, app } from 'electron'
+import { type Observable, Subject, filter, delayWhen, from } from 'rxjs'
 import { type Stream } from 'xstream'
 
 import { adapt } from '@cycle/run/lib/adapt'
@@ -35,7 +35,9 @@ interface MenuItemClickEvent {
 export class ApplicationMenuSource<T extends string> {
   private readonly menuItemClick$ = new Subject<MenuItemClickEvent>()
   constructor (sink$: Observable<MenuItemOptions[]>) {
-    sink$.subscribe({
+    sink$.pipe(
+      delayWhen(() => from(app.whenReady()))
+    ).subscribe({
       next: this.handleUpdateMenu,
       error: console.error
     })
