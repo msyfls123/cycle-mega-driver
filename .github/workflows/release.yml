@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  call-workflow-check:
+  check:
     uses: ./.github/workflows/check.yml
   release:
     runs-on: ubuntu-latest
