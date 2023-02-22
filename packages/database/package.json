@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/database",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Cyclejs bingdings for abstract-level database.",
   "keywords": [
     "cyclejs",
