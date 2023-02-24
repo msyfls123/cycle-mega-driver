@@ -14,7 +14,7 @@ const packageDir = path.join(__dirname, '../packages', scope)
 
 fs.promises.access(packageDir).then(async () => {
   const files = await fs.promises.readdir(packageDir)
-  if (!files.includes('rollup.config.js')) {
+  if (!files.includes('rollup.config.mjs')) {
     await fs.promises.copyFile(
       path.join(__dirname, 'rollup.config.mjs.tmpl'),
       path.join(packageDir, 'rollup.config.mjs'),
@@ -30,6 +30,12 @@ fs.promises.access(packageDir).then(async () => {
     await fs.promises.copyFile(
       path.join(__dirname, 'tsconfig.json.tmpl'),
       path.join(packageDir, 'tsconfig.json'),
+    )
+  }
+  if (!files.includes('LICENSE.md')) {
+    await fs.promises.copyFile(
+      path.join(__dirname, 'LICENSE.md'),
+      path.join(packageDir, 'LICENSE.md'),
     )
   }
   console.info(`✅ Init Package <@cycle-mega-driver/${scope}> Success!`)
