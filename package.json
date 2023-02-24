@@ -50,6 +50,7 @@
   },
   "scripts": {
     "init": "node ./template/init-package.mjs",
+    "bootstrap": "lerna bootstrap && lerna link",
     "clean": "lerna run clean",
     "eslint": "lerna run eslint",
     "type-check": "lerna run tsc",

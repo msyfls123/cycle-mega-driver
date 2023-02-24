@@ -36,6 +36,7 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
+    "@cycle-mega-driver/common": "*",
     "leveldown": "^6.1.1",
     "pouchdb-adapter-leveldb": "^8.0.1",
     "rx-pouch": "^0.6.9",

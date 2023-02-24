@@ -19,6 +19,7 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/prefer-reduce-type-parameter': 'warn',
+        '@typescript-eslint/consistent-type-imports': 'off',
         '@typescript-eslint/restrict-template-expressions': ['warn', { allowNumber: true }]
       }
     }

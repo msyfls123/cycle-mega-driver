@@ -5,8 +5,9 @@ import { type Stream } from 'xstream'
 import { adapt } from '@cycle/run/lib/adapt'
 
 import { IPC_MAIN_CHANNEL, IPC_RENDERER_CHANNEL, type IpcScope, type IpcMainSourceEventPayload } from '@src/constants/ipc'
-import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type Obj, xsToObservable, type IpcSource } from '@src/utils/observable'
+import { type ChannelConfigToSink, type ChannelConfigToWebSink, type ChannelConfigToWebSource, type IpcSource } from '@src/utils/observable'
 import { attachIpcSinkScope, matchIpcScope, matchIpcSink } from './isolate'
+import { Obj, xsToObservable } from '@cycle-mega-driver/common/lib'
 
 export { createIpcScope } from './isolate'
 

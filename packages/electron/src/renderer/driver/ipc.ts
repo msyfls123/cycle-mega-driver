@@ -2,10 +2,10 @@ import { Observable } from 'rxjs'
 import { type Stream } from 'xstream'
 
 import { IPC_INTERCEPTOR, type IpcMainSourceEventResponse } from '../../constants/ipc'
-import { adaptObservable, type ChannelConfigToSink, type Obj } from '../../utils/observable'
+import { Obj, adaptObservable } from '@cycle-mega-driver/common/lib'
+import { ChannelConfigToSink } from '@src/utils'
 
 let uuid = 0
-
 export class IpcRendererSource<Output extends Obj, Input extends Obj> {
   constructor (sink$: Observable<ChannelConfigToSink<Output>>) {
     sink$.subscribe((payload) => {

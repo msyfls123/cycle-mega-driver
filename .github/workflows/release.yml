@@ -21,6 +21,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npx yarn --ci --prefer-offline
+          npx yarn bootstrap
       - name: Build
         run: |
           npm run build

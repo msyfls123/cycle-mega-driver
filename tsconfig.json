@@ -20,6 +20,12 @@
             "DOM.Iterable",
             "ES2018.Promise"
         ],
+        "plugins": [
+          {
+              "transform": "@zerollup/ts-transform-paths",
+              "exclude": ["*"]
+          }
+        ]
     },
     "include": [
       "example/src/**/*",

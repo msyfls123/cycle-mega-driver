@@ -1,4 +1,4 @@
-import { type Obj } from '../utils/observable'
+import { type Obj } from '@cycle-mega-driver/common/lib/observable'
 
 export const IPC_INTERCEPTOR = '$CYCLE_MEGA_IPC_INTERCEPTOR$'
 const IPC_PREFIX = '$CYCLE_MEGA_DRIVER$'

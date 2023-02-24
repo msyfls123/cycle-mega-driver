@@ -1,5 +1,11 @@
 import { type App, app } from 'electron'
-import { adaptObservable, xsToObservable, type IntoEntries, pick, type MapValueToObservable, intoEntries } from '../../utils/observable'
+import {
+  type IntoEntries,
+  pickFromEntries,
+  type MapValueToObservable,
+  intoEntries,
+  adaptObservable, xsToObservable
+} from '@cycle-mega-driver/common/lib'
 import { type Observable, fromEvent, withLatestFrom, startWith, delayWhen, connectable, ReplaySubject, BehaviorSubject, takeUntil, skipUntil, map } from 'rxjs'
 import fs from 'fs'
 import os from 'os'
@@ -75,10 +81,10 @@ export class AppLifecycleSource {
   }
 
   constructor (sink$: Observable<AppLifecycleSink>) {
-    const state$ = sink$.pipe(pick('state'), startWith('default' as const))
-    const isQuittingEnabled$ = sink$.pipe(pick('isQuittingEnabled'), startWith(true))
-    const exitCode$ = sink$.pipe(pick('exitCode'), startWith(0))
-    const setPath$ = sink$.pipe(pick('setPath'))
+    const state$ = sink$.pipe(pickFromEntries('state'), startWith('default' as const))
+    const isQuittingEnabled$ = sink$.pipe(pickFromEntries('isQuittingEnabled'), startWith(true))
+    const exitCode$ = sink$.pipe(pickFromEntries('exitCode'), startWith(0))
+    const setPath$ = sink$.pipe(pickFromEntries('setPath'))
 
     state$.pipe(
       withLatestFrom(exitCode$)

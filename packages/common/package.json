@@ -1,24 +1,23 @@
 {
-  "name": "@cycle-mega-driver/electron",
+  "name": "@cycle-mega-driver/common",
   "version": "0.2.2",
-  "description": "Electron drivers for making development painless.",
+  "description": "Common utilities for other drivers.",
   "keywords": [
-    "electron",
-    "cyclejs"
+    "cyclejs",
+    "utility"
   ],
   "author": "msyfls123 <msyfls123@gmail.com>",
   "homepage": "https://github.com/msyfls123/cycle-mega-driver#readme",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "lib/index.js",
-  "files": [
-    "lib/",
-    "dist/"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org",
-    "access": "public"
+  "directories": {
+    "lib": "lib"
   },
+  "files": [
+    "lib",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
@@ -32,12 +31,7 @@
   "bugs": {
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
-  "peerDependencies": {
-    "@cycle/rxjs-run": "^10.5.0",
-    "electron": "^19"
-  },
   "dependencies": {
-    "rxjs": "^7.8.0",
-    "@cycle-mega-driver/common": "*"
+    "rxjs": "^7.8.0"
   }
 }
