@@ -29,7 +29,8 @@
     "build": "rollup -c rollup.config.mjs"
   },
   "bugs": {
-    "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
+    "url": "https://github.com/msyfls123/cycle-mega-driver/issues",
+    "access": "public"
   },
   "dependencies": {
     "rxjs": "^7.8.0"
