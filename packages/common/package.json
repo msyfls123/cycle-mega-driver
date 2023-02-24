@@ -20,7 +20,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
+    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git",
+    "access": "public"
   },
   "scripts": {
     "clean": "rimraf dist lib",
@@ -29,8 +30,7 @@
     "build": "rollup -c rollup.config.mjs"
   },
   "bugs": {
-    "url": "https://github.com/msyfls123/cycle-mega-driver/issues",
-    "access": "public"
+    "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
     "rxjs": "^7.8.0"
