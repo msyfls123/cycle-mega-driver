@@ -20,7 +20,7 @@ jobs:
           npx yarn bootstrap
       - name: Build For Dev
         run: |
-          npm yarn build-dev
+          npx yarn build-dev
       - name: Run ESLint
         run: |
           npm run eslint
