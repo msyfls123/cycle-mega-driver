@@ -18,10 +18,13 @@
     "lib",
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git",
-    "access": "public"
+    "url": "git+https://github.com/msyfls123/cycle-mega-driver.git"
   },
   "scripts": {
     "clean": "rimraf dist lib",
