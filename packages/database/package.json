@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/database",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Cyclejs bingdings for abstract-level database.",
   "keywords": [
     "cyclejs",
@@ -36,7 +36,7 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
-    "@cycle-mega-driver/common": "^0.2.4",
+    "@cycle-mega-driver/common": "^0.2.5",
     "leveldown": "^6.1.1",
     "pouchdb-adapter-leveldb": "^8.0.1",
     "rx-pouch": "^0.6.9",
