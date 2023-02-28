@@ -27,7 +27,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
 
   // browser window
   const create$ = of(
-    {
+    browser.createSink({
       create: {
         ctorOptions: {
           webPreferences: {
@@ -36,8 +36,8 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
         },
         category: Category.Mainland
       },
-    },
-    {
+    }),
+    browser.createSink({
       create: {
         ctorOptions: {
           webPreferences: {
@@ -45,18 +45,18 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
           }
         },
       },
-    },
+    }),
   )
 
   const loadUrl$ = browser.newWindow().pipe(
-    map(w => ({
+    map(w => browser.createSink({
       id: w.id,
       loadURL: CATEGORY_RENDERER_MAP[getCategory(w)] ?? `about:blank#${getCategory(w)}`,
     }))
   )
 
   const openDevTools$ = browser.newWindow().pipe(
-    map(w => ({
+    map(w => browser.createSink({
       id: w.id,
       openDevTools: w.id === 1 ? { mode: 'right' } as const : { mode: 'bottom' } as const,
     }))
@@ -66,7 +66,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
     ...TAB_MENU.map((id, index) => menu.select(id).pipe(map(() => index)))
   ).pipe(
     withLatestFrom(browserIds$),
-    map(([index, browserIds]) => ({
+    map(([index, browserIds]) => browser.createSink({
       id: Array.from(browserIds)[index],
       focus: true,
     }))
@@ -105,7 +105,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
 
   return {
     browser: merge(
-      ...(mainlandBrowser$ ? [mainlandBrowser$] : []),
+      mainlandBrowser$,
       focusByMenu,
       create$,
       loadUrl$,

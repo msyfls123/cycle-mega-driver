@@ -18,7 +18,7 @@ export const Mainland: MatchMain<{
   const toggle$ = ipc.select('toggle-focus')
   const blurFromRenderer$ = toggle$.pipe(
     // filter(({ browserWindow }) => checkBrowserAvailable(browserWindow)),
-    map(({ data, browserWindow }) => ({
+    map(({ data, browserWindow }) => browser.createSink({
       id: browserWindow?.id,
       focus: data,
     })),
