@@ -36,5 +36,6 @@ export const TAB_MENU = [
 ]
 
 export enum Category {
-  Mainland = 'mainland'
+  Mainland = 'mainland',
+  DBViewer = 'db-viewer'
 }

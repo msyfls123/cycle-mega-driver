@@ -44,6 +44,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
             preload: path.join(__dirname, 'preload.js')
           }
         },
+        category: Category.DBViewer
       },
     }),
   )

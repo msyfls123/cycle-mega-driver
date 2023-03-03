@@ -12,4 +12,5 @@ const rendererFilePaths =
 
 export const CATEGORY_RENDERER_MAP = {
   [Category.Mainland]: rendererFilePaths.mainland,
+  [Category.DBViewer]: rendererFilePaths['db-viewer'],
 }
