@@ -1,13 +1,17 @@
-import pouchLevelDB from 'pouchdb-adapter-leveldb'
-import RxPouch from 'rx-pouch'
-import type RxPouchDatabase from 'rx-pouch/dist/Db'
+import { ComparatorMap, Comparators, Model } from './constants/db'
+import { type Stream } from 'xstream'
+import { DatabaseConfig } from './constants/sink'
+import { IntoEntries, xsToObservable } from '@cycle-mega-driver/common/lib'
+import { Database, DatabaseSource } from './database'
+import './utils/polyfill'
 
-RxPouch.plugin(pouchLevelDB)
+export function makeDatabaseDriver<M extends Model, C extends Comparators, Category extends string = string> (comparatorMap: ComparatorMap<M, C>) {
+  return (xs$: Stream<IntoEntries<DatabaseConfig<M, C, Category>>>): DatabaseSource<M, C, Category> => {
+    const sink$ = xsToObservable(xs$)
 
-export function getDatabase (name: string): RxPouchDatabase {
-  const db = new RxPouch(name) as RxPouchDatabase
-  db.changes().change$.subscribe((data) => {
-    console.log('changes', data)
-  })
-  return db
+    return new Database({
+      comparatorMap,
+      sink$,
+    })
+  }
 }
