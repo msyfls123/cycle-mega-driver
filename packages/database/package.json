@@ -16,7 +16,8 @@
   },
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "patches"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
@@ -30,7 +31,8 @@
     "clean": "rimraf dist lib",
     "eslint": "eslint ./src",
     "tsc": "tsc --noEmit",
-    "build": "rollup -c rollup.config.mjs"
+    "build": "rollup -c rollup.config.mjs",
+    "postinstall": "patch-package"
   },
   "bugs": {
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
@@ -39,10 +41,16 @@
     "@cycle-mega-driver/common": "^0.2.8",
     "leveldown": "^6.1.1",
     "pouchdb-adapter-leveldb": "^8.0.1",
-    "rx-pouch": "^0.6.9",
+    "deep-array-filter": "^1.0.4",
+    "fast-sort": "^1.5.4",
+    "pouchdb-adapter-http": "^7.0.0",
+    "pouchdb-core": "^7.0.0",
+    "pouchdb-mapreduce": "^7.0.0",
+    "pouchdb-replication": "^7.0.0",
     "rxjs": "^7.8.0"
   },
   "devDependencies": {
+    "rx-pouch": "0.6.9",
     "@types/pouchdb-adapter-leveldb": "^6.1.3"
   }
 }

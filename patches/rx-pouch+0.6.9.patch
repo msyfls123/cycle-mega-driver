@@ -1,0 +1,35 @@
+diff --git a/node_modules/rx-pouch/.DS_Store b/node_modules/rx-pouch/.DS_Store
+new file mode 100644
+index 0000000..8ef3458
+Binary files /dev/null and b/node_modules/rx-pouch/.DS_Store differ
+diff --git a/node_modules/rx-pouch/dist/index.es.js b/node_modules/rx-pouch/dist/index.es.js
+index e807a10..8efd702 100644
+--- a/node_modules/rx-pouch/dist/index.es.js
++++ b/node_modules/rx-pouch/dist/index.es.js
+@@ -1,9 +1,9 @@
+-import { Subject, BehaviorSubject, fromEvent } from 'rxjs';
+-import { filter, first } from 'rxjs/operators';
+-import PouchDB from 'pouchdb-core';
+ import PouchHttp from 'pouchdb-adapter-http';
++import PouchDB from 'pouchdb-core';
+ import PouchMapReduce from 'pouchdb-mapreduce';
+ import PouchReplication from 'pouchdb-replication';
++import { BehaviorSubject, Subject, fromEvent } from 'rxjs';
++import { filter, first } from 'rxjs/operators';
+ 
+ /*! *****************************************************************************
+ Copyright (c) Microsoft Corporation. All rights reserved.
+@@ -296,7 +296,12 @@ var Filter = /** @class */ (function () {
+         var _this = this;
+         this._docsSubject.next(this._getAllDocs());
+         if (this._filter$ && this._filterType$) {
+-            this._filter$.combineLatest(this._filterType$, this.setFilter);
++            this._filter$.subscribe(d => {
++              this.setFilter(d, this._filterType)
++            })
++            this._filterType$.subscribe(d => {
++              this.setFilter(this._filter, d)
++            })
+         }
+         if (this._sort$) {
+             this._sort$.subscribe(function (next) {

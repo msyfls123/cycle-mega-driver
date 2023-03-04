@@ -7,6 +7,7 @@ import typescript from 'rollup-plugin-typescript2'
 import ttypescript from 'ttypescript'
 
 import commonjs from '@rollup/plugin-commonjs'
+import json from '@rollup/plugin-json'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -33,6 +34,7 @@ const commonConfig = {
 }
 
 const plugins = [
+  json(),
   autoExternal({
     packagePath: path.join(__dirname, 'package.json'),
   }),
