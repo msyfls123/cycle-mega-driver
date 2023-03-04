@@ -5,6 +5,7 @@ import { swc } from 'rollup-plugin-swc3'
 import commonjs from '@rollup/plugin-commonjs'
 import html from '@rollup/plugin-html'
 import inject from '@rollup/plugin-inject'
+import json from '@rollup/plugin-json'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 import { distDir, exampleDir, srcDir } from './constants.mjs'
@@ -15,6 +16,7 @@ const { RENDERER_ENTRY } = rendererConfig
 // const isProduction = process.env.NODE_ENV === 'production'
 
 const plugins = [
+  json(),
   nodeResolve({
     preferBuiltins: true
   }),
@@ -40,12 +42,14 @@ const main = {
     dir: distDir,
     format: 'cjs',
     globals: {
-      electron: 'require("electron")'
+      electron: 'require("electron")',
+      leveldown: 'require("leveldown")',
     },
     sourcemap: 'inline'
   },
   external: [
-    'electron'
+    'electron',
+    'leveldown'
   ],
   plugins
 }

@@ -1,3 +1,5 @@
+// import { Model } from '@cycle-mega-driver/database/lib/constants/db'
+
 export interface IPCMainConfig {
   visible: string
   test: boolean // nothing to do
@@ -34,6 +36,32 @@ export const TAB_MENU = [
   MenuId.Tab8,
   MenuId.Tab9
 ]
+
+interface User {
+  _id: string
+  type: 'user'
+  name: string
+  age: number
+}
+
+interface Deposit {
+  _id: string
+  type: 'deposit'
+  balance: number
+  loan: number
+  userId: string
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type DatabaseModel = {
+  user: User
+  deposit: Deposit
+}
+
+export enum DatabaseCategory {
+  Collection = 'collection',
+  Create = 'create',
+}
 
 export enum Category {
   Mainland = 'mainland',
