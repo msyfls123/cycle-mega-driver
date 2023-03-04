@@ -1,6 +1,6 @@
 {
   "name": "cycle-mega-driver",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "private": "true",
   "description": "Cycle.js Driver for Making Electron Great Again.",
   "main": "dist/index.js",
@@ -21,6 +21,7 @@
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-html": "^1.0.2",
     "@rollup/plugin-inject": "^5.0.3",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@swc/core": "^1.3.24",
     "@types/lodash": "^4.14.191",
@@ -37,6 +38,7 @@
     "gulp": "^4.0.2",
     "lerna": "^6.5.1",
     "lodash": "^4.17.21",
+    "patch-package": "^6.5.1",
     "rollup": "^3.9.0",
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-swc3": "^0.7.0",
@@ -51,7 +53,7 @@
   "scripts": {
     "init": "node ./template/init-package.mjs",
     "bootstrap": "lerna bootstrap && lerna link",
-    "clean": "lerna run clean",
+    "clean": "lerna clean && lerna run clean",
     "eslint": "lerna run eslint",
     "type-check": "lerna run tsc",
     "build": "cross-env NODE_ENV=production lerna run build",
@@ -62,7 +64,8 @@
     "watch-win": "chcp 65001 && npm run watch",
     "watch-packages": "lerna watch -- lerna run build --scope=\\$LERNA_PACKAGE_NAME",
     "example": "rollup -c example/rollup.config.mjs",
-    "run-example": "electron example/dist/main.js"
+    "run-example": "DEBUG=* electron example/dist/main.js",
+    "postinstall": "patch-package"
   },
   "peerDependencies": {
     "electron": "^19"
