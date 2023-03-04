@@ -5,20 +5,22 @@ import {
   createBrowserWindowScope,
   getCategory,
 } from '@cycle-mega-driver/electron/lib/main'
-import { type Observable, merge, of } from 'rxjs'
-import { map, take, withLatestFrom } from 'rxjs/operators'
+import { type Observable, merge, of, asyncScheduler } from 'rxjs'
+import { delayWhen, map, take, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
 import { setup } from '@cycle/rxjs-run'
 import debug from 'debug'
 
 import { Menu } from './component/Menu'
-import { MenuId, TAB_MENU, Category } from './constants'
+import { MenuId, TAB_MENU, Category, DatabaseCategory } from './constants'
 import { Mainland } from './component/Mainland'
 import { CATEGORY_RENDERER_MAP } from './main/constants'
 import { MAIN_DRIVERS, type MainComponent } from './main/driver'
 
-const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
+const TEST_DATA = 'delta'
+
+const main: MainComponent = ({ browser, ipc, menu, lifecycle, database }) => {
   // menu
   const browserIds$ = browser.allWindows().pipe(
     map((windows) => new Set(windows.map(w => w.id)))
@@ -73,6 +75,47 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
     }))
   )
 
+  // [WIP] database
+  const setup$ = lifecycle.paths.userData.pipe(
+    lifecycle.untilReady,
+    map((dir) => database.createSink('setup', { dbDir: path.join(dir, 'mydb') }))
+  )
+
+  const collection$ = of(database.createSink(DatabaseCategory.Collection, {
+    docType: 'user',
+    category: DatabaseCategory.Collection,
+    observableOptions: {
+      filter: of(
+        { name: TEST_DATA },
+        asyncScheduler,
+      ),
+      filterType: of(({
+        name: 'includes' as const
+      }))
+    },
+  })).pipe(delayWhen(() => setup$))
+
+  const insertion$ = of(database.createSink(DatabaseCategory.Create, {
+    payload: {
+      type: 'user',
+      name: TEST_DATA,
+      age: 24,
+      _id: TEST_DATA,
+    },
+    docType: 'user',
+    category: DatabaseCategory.Create,
+  })).pipe(
+    delayWhen(() => database.category(DatabaseCategory.Collection)),
+  )
+
+  database.select(DatabaseCategory.Collection, 'user').subscribe(({ docs }) => {
+    debug('output')(docs)
+  })
+
+  database.errors(DatabaseCategory.Create).subscribe((err) => {
+    debug('error')(err)
+  })
+
   // lifecycle
   const appState$ = menu.select(MenuId.Quit).pipe(
     map(() => 'quit' as const)
@@ -119,6 +162,11 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle }) => {
       isQuittingEnabled: enableQuit$,
       setPath: userData$,
     }),
+    database: merge(
+      setup$,
+      collection$,
+      insertion$,
+    )
   }
 }
 const program = setup(
