@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/database",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "description": "Cyclejs bingdings for abstract-level database.",
   "keywords": [
     "cyclejs",
@@ -38,19 +38,19 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
-    "@cycle-mega-driver/common": "^0.2.8",
-    "leveldown": "^6.1.1",
-    "pouchdb-adapter-leveldb": "^8.0.1",
+    "@cycle-mega-driver/common": "^0.3.0",
     "deep-array-filter": "^1.0.4",
     "fast-sort": "^1.5.4",
+    "leveldown": "^6.1.1",
     "pouchdb-adapter-http": "^7.0.0",
+    "pouchdb-adapter-leveldb": "^8.0.1",
     "pouchdb-core": "^7.0.0",
     "pouchdb-mapreduce": "^7.0.0",
     "pouchdb-replication": "^7.0.0",
     "rxjs": "^7.8.0"
   },
   "devDependencies": {
-    "rx-pouch": "0.6.9",
-    "@types/pouchdb-adapter-leveldb": "^6.1.3"
+    "@types/pouchdb-adapter-leveldb": "^6.1.3",
+    "rx-pouch": "0.6.9"
   }
 }
