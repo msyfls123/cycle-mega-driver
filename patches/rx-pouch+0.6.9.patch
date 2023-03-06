@@ -1,9 +1,8 @@
 diff --git a/node_modules/rx-pouch/.DS_Store b/node_modules/rx-pouch/.DS_Store
 new file mode 100644
-index 0000000..8ef3458
-Binary files /dev/null and b/node_modules/rx-pouch/.DS_Store differ
+index 0000000..e69de29
 diff --git a/node_modules/rx-pouch/dist/index.es.js b/node_modules/rx-pouch/dist/index.es.js
-index e807a10..8efd702 100644
+index e807a10..1a90e24 100644
 --- a/node_modules/rx-pouch/dist/index.es.js
 +++ b/node_modules/rx-pouch/dist/index.es.js
 @@ -1,9 +1,9 @@
@@ -33,3 +32,14 @@ index e807a10..8efd702 100644
          }
          if (this._sort$) {
              this._sort$.subscribe(function (next) {
+@@ -495,8 +500,8 @@ var Collection = /** @class */ (function () {
+                             _this._filter.updateInStore(next.doc);
+                         }));
+                         this._subs.push(this.remove$.subscribe(function (next) {
+-                            _this._store.removeFromStore(next.doc);
+-                            _this._filter.removeFromStore(next.doc);
++                            _this._store.removeFromStore(next.id);
++                            _this._filter.removeFromStore(next.id);
+                         }));
+                         return [2 /*return*/, res];
+                 }

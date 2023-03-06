@@ -1,12 +1,16 @@
 // import { Model } from '@cycle-mega-driver/database/lib/constants/db'
 
+import { IntoEntries } from '@cycle-mega-driver/common/lib'
+import { Doc, DocumentConfig } from '@cycle-mega-driver/database/lib/constants'
+
 export interface IPCMainConfig {
   visible: string
-  test: boolean // nothing to do
+  'user-list': User[]
 }
 
 export interface IPCRendererConfig {
   'toggle-focus': boolean
+  'manipulate-document': IntoEntries<DocumentConfig<DatabaseModel, 'user', DatabaseCategory>>
   language: string
 }
 
@@ -37,7 +41,7 @@ export const TAB_MENU = [
   MenuId.Tab9
 ]
 
-interface User {
+export interface User extends Doc {
   _id: string
   type: 'user'
   name: string
@@ -60,8 +64,10 @@ export type DatabaseModel = {
 
 export enum DatabaseCategory {
   Collection = 'collection',
-  Create = 'create',
+  Document = 'document',
 }
+
+export type DatabaseExtraComparators = never
 
 export enum Category {
   Mainland = 'mainland',

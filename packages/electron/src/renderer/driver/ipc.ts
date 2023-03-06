@@ -36,6 +36,13 @@ export class IpcRendererSource<Output extends Obj, Input extends Obj> {
     })
     return adaptObservable(observable)
   }
+
+  public createSink <T extends keyof Output> (channel: T, data: Output[T]): ChannelConfigToSink<Output> {
+    return {
+      channel,
+      data,
+    }
+  }
 }
 
 export function makeIpcRendererDriverNg<Output extends Obj, Input extends Obj> () {

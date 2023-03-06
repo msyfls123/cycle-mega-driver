@@ -2,8 +2,10 @@
 import { IModel } from 'rx-pouch/dist/interfaces/IModel'
 import { Observable } from 'rxjs'
 
+export type Doc = IModel
 export type Model = Record<string, IModel>
 export type DocType<M extends Model> = keyof M & string
+export type DocMethod = 'update' | 'create' | 'remove'
 
 export type Comparators = string | never
 

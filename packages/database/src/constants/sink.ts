@@ -11,7 +11,13 @@ export interface CollectionPayload<M extends Model, C extends Comparators, K ext
 }
 
 export interface CreatePayload<M extends Model, T extends DocType<M>, Category extends string> {
-  payload: Omit<M[T], '_id'> & Pick<Partial<M[T]>, '_id'>
+  doc: Omit<M[T], '_id'> & Pick<Partial<M[T]>, '_id'>
+  category: Category
+  docType: T
+}
+
+export interface DocPayload<M extends Model, T extends DocType<M>, Category extends string> {
+  doc: M[T]
   category: Category
   docType: T
 }
@@ -20,10 +26,17 @@ export interface SetupPayload {
   dbDir: string
 }
 
-export interface DatabaseConfig<M extends Model, C extends Comparators, Category extends string> {
-  create: CreatePayload<M, keyof M & string, Category>
-  update: M[keyof M]
-  remove: M[keyof M]
+export interface DocumentConfig<M extends Model, T extends DocType<M>, Category extends string> {
+  create: CreatePayload<M, T, Category>
+  update: DocPayload<M, T, Category>
+  remove: DocPayload<M, T, Category>
+}
+
+export interface DatabaseConfig<
+  M extends Model,
+  C extends Comparators,
+  Category extends string
+> extends DocumentConfig<M, DocType<M>, Category> {
   collection: CollectionPayload<M, C, Category>
   setup: SetupPayload
 }

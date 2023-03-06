@@ -31,8 +31,7 @@
     "clean": "rimraf dist lib",
     "eslint": "eslint ./src",
     "tsc": "tsc --noEmit",
-    "build": "rollup -c rollup.config.mjs",
-    "postinstall": "patch-package"
+    "build": "rollup -c rollup.config.mjs"
   },
   "bugs": {
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"

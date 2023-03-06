@@ -5,8 +5,8 @@ import type RxPouchDatabase from 'rx-pouch/dist/Db'
 import { Connectable, Observable, ReplaySubject, Subject, connectable, filter, map, scan } from 'rxjs'
 
 import { pickFromEntries } from '@cycle-mega-driver/common/lib'
-import { ComparatorMap, Comparators, DocType, Model } from '@src/constants/db'
-import { CollectionPayload, CreatePayload, DatabaseConfig, DatabaseSink, SetupPayload } from '@src/constants/sink'
+import { ComparatorMap, Comparators, DocMethod, DocType, Model } from '@src/constants/db'
+import { CollectionPayload, CreatePayload, DatabaseConfig, DatabaseSink, DocPayload, SetupPayload } from '@src/constants/sink'
 import { DatabaseDocsSource, DocsSources, ErrorSource } from '@src/constants/source'
 
 RxPouch.plugin(pouchLevelDB)
@@ -20,6 +20,8 @@ export class DatabaseSource<M extends Model, C extends Comparators, Category ext
   select: <K extends Category, T extends DocType<M>> (category: K, docType: T) => Observable<DatabaseDocsSource<M, K, T>>
 
   createSink<T extends DocType<M>>(key: 'create', payload: CreatePayload<M, T, Category>): DatabaseSink<M, C, Category>
+  createSink<T extends DocType<M>>(key: 'update', payload: DocPayload<M, T, Category>): DatabaseSink<M, C, Category>
+  createSink<T extends DocType<M>>(key: 'remove', payload: DocPayload<M, T, Category>): DatabaseSink<M, C, Category>
   createSink (key: 'setup', payload: SetupPayload): DatabaseSink<M, C, Category>
   createSink<K extends Category, T extends DocType<M>>(key: 'collection', payload: CollectionPayload<M, C, K, T>)
   createSink<K extends keyof DatabaseConfig<M, C, Category>>(
@@ -54,11 +56,7 @@ class Database<M extends Model, C extends Comparators, Category extends string =
     const collection$ = sink$.pipe(pickFromEntries('collection'))
     collection$.subscribe(this.handleCollectionSink.bind(this))
 
-    const create$ = sink$.pipe(pickFromEntries('create'))
-    create$.subscribe(({ category, payload }) => {
-      const item: M[keyof M] = { _id: 'test', ...payload } as any
-      this.handleAdd(category, item)
-    })
+    this.handleDocumentSink(sink$)
 
     const setup$ = sink$.pipe(pickFromEntries('setup'))
     setup$.subscribe(({ dbDir }) => {
@@ -104,9 +102,27 @@ class Database<M extends Model, C extends Comparators, Category extends string =
     } as DatabaseSink<M, C, Category>
   }
 
-  private handleAdd (category: Category, item: M[keyof M]) {
+  private handleDocumentSink (sink$: Observable<DatabaseSink<M, C, Category>>) {
+    const create$ = sink$.pipe(pickFromEntries('create'))
+    create$.subscribe(({ category, doc }) => {
+      const item: M[keyof M] = { _id: 'test', ...doc } as M[keyof M]
+      this.manipulateDoc(category, item, 'create')
+    })
+
+    const update$ = sink$.pipe(pickFromEntries('update'))
+    update$.subscribe(({ category, doc }) => {
+      this.manipulateDoc(category, doc, 'update')
+    })
+
+    const remove$ = sink$.pipe(pickFromEntries('remove'))
+    remove$.subscribe(({ category, doc }) => {
+      this.manipulateDoc(category, doc, 'remove')
+    })
+  }
+
+  private manipulateDoc (category: Category, item: M[keyof M], method: DocMethod) {
     const { type: docType } = item
-    this.collectionCache.get(docType)?.create(item).catch((err) => {
+    this.collectionCache.get(docType)?.[method](item).catch((err) => {
       this.errorsSubject.next({
         category,
         status: err.status,

@@ -5,7 +5,7 @@ import {
   createBrowserWindowScope,
   getCategory,
 } from '@cycle-mega-driver/electron/lib/main'
-import { type Observable, merge, of, asyncScheduler } from 'rxjs'
+import { type Observable, merge, of } from 'rxjs'
 import { delayWhen, map, take, withLatestFrom } from 'rxjs/operators'
 
 import isolate from '@cycle/isolate'
@@ -17,6 +17,7 @@ import { MenuId, TAB_MENU, Category, DatabaseCategory } from './constants'
 import { Mainland } from './component/Mainland'
 import { CATEGORY_RENDERER_MAP } from './main/constants'
 import { MAIN_DRIVERS, type MainComponent } from './main/driver'
+import { UserDatabase } from './component/UserDatabase'
 
 const TEST_DATA = 'delta'
 
@@ -81,38 +82,24 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle, database }) => {
     map((dir) => database.createSink('setup', { dbDir: path.join(dir, 'mydb') }))
   )
 
-  const collection$ = of(database.createSink(DatabaseCategory.Collection, {
-    docType: 'user',
-    category: DatabaseCategory.Collection,
-    observableOptions: {
-      filter: of(
-        { name: TEST_DATA },
-        asyncScheduler,
-      ),
-      filterType: of(({
-        name: 'includes' as const
-      }))
-    },
-  })).pipe(delayWhen(() => setup$))
+  const { database: userDatabase$, ipc: userIpc$ } = UserDatabase({
+    database, ipc, databaseSetup$: setup$,
+  })
 
-  const insertion$ = of(database.createSink(DatabaseCategory.Create, {
-    payload: {
+  const insertion$ = of(database.createSink('create', {
+    doc: {
       type: 'user',
       name: TEST_DATA,
       age: 24,
       _id: TEST_DATA,
     },
     docType: 'user',
-    category: DatabaseCategory.Create,
+    category: DatabaseCategory.Document,
   })).pipe(
     delayWhen(() => database.category(DatabaseCategory.Collection)),
   )
 
-  database.select(DatabaseCategory.Collection, 'user').subscribe(({ docs }) => {
-    debug('output')(docs)
-  })
-
-  database.errors(DatabaseCategory.Create).subscribe((err) => {
+  database.errors(DatabaseCategory.Document).subscribe((err) => {
     debug('error')(err)
   })
 
@@ -155,7 +142,10 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle, database }) => {
       loadUrl$,
       openDevTools$,
     ),
-    ipc: mainlandIpc$,
+    ipc: merge(
+      mainlandIpc$,
+      userIpc$,
+    ),
     menu: menu$,
     lifecycle: lifecycle.createSink({
       state: appState$,
@@ -164,7 +154,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle, database }) => {
     }),
     database: merge(
       setup$,
-      collection$,
+      userDatabase$,
       insertion$,
     )
   }

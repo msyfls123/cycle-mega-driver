@@ -5,7 +5,7 @@ import { makeDOMDriver } from '@cycle/dom/lib/cjs/rxjs'
 import { IPCMainConfig, IPCRendererConfig } from '../constants'
 
 export const RENDERER_DRIVERS = {
-  ipc: makeIpcRendererDriverNg<IPCMainConfig, IPCRendererConfig>(),
+  ipc: makeIpcRendererDriverNg<IPCRendererConfig, IPCMainConfig>(),
   dom: makeDOMDriver('body'),
 }
 

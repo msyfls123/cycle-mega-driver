@@ -1,5 +1,6 @@
 import path from 'path'
 
+import postcss from 'rollup-plugin-postcss'
 import { swc } from 'rollup-plugin-swc3'
 
 import commonjs from '@rollup/plugin-commonjs'
@@ -33,7 +34,8 @@ const plugins = [
       target: 'es5'
     },
     sourceMaps: true
-  })
+  }),
+  postcss(),
 ]
 
 const main = {
