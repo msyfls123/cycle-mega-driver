@@ -1,5 +1,5 @@
+import { CustomMain, PickComponent } from '@cycle-mega-driver/common/lib'
 import { makeIpcRendererDriverNg } from '@cycle-mega-driver/electron/lib/renderer'
-import { CustomMain, PickComponent } from '@cycle-mega-driver/electron/lib/utils'
 import { makeDOMDriver } from '@cycle/dom/lib/cjs/rxjs'
 
 import { IPCMainConfig, IPCRendererConfig } from '../constants'

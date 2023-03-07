@@ -1,20 +1,26 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import { combineLatest, filter, map, merge, startWith, withLatestFrom } from 'rxjs'
+import { Observable, combineLatest, filter, map, merge, of, startWith, withLatestFrom } from 'rxjs'
 
+import { StateSource, setupAdapt, withState } from '@cycle-mega-driver/common/lib'
 import { setup } from '@cycle/rxjs-run'
 
 import { DatabaseCategory, User } from '../constants'
-import { setupAdapt } from '../utils/adapt'
 import { MatchRendererMain, RENDERER_DRIVERS } from './driver'
 
 const main: MatchRendererMain<{
   SourceKeys: 'ipc' | 'dom'
   SinkKeys: 'ipc' | 'dom'
-}> = ({ ipc, dom }) => {
+  ExtraSources: { state: StateSource<number> }
+  ExtraSinks: { state: Observable<any> }
+}> = ({ ipc, dom, state }) => {
+  const initialState$ = of(() => 0)
+  const reducer$ = dom.events('click').pipe(map(() => (prevState: number) => prevState + 1))
+
   const domSink$ = combineLatest([
-    ipc.select('user-list').pipe(startWith([] as User[]))
-  ]).pipe(map(([users]) => (
+    ipc.select('user-list').pipe(startWith([] as User[])),
+    state.observable,
+  ]).pipe(map(([users, state]) => (
     <div className="container">
       <form>
         <div className="form-group mb-3">
@@ -39,7 +45,7 @@ const main: MatchRendererMain<{
             </tr>
           </thead>
           <tbody>
-            {users.map(({ name, age, _rev, _id }, index) => (
+            {users.map(({ name, age, _rev, _id }, index: number) => (
               <tr>
                 <th scope="row">{index + 1}</th>
                 <td>{name}</td>
@@ -53,6 +59,7 @@ const main: MatchRendererMain<{
           </tbody>
         </table>
       </div></div>
+      <p>Clicked: {state}</p>
     </div>
   )))
 
@@ -90,7 +97,7 @@ const main: MatchRendererMain<{
             doc: {
               _id: form['name-input'].value,
               name: form['name-input'].value,
-              age: form.age.value,
+              age: Number(form.age.value),
               type: 'user',
             },
           }
@@ -105,9 +112,10 @@ const main: MatchRendererMain<{
       create$,
     ),
     dom: domSink$,
+    state: merge(initialState$, reducer$),
   }
 }
 
 setupAdapt()
-const program = setup(main, RENDERER_DRIVERS)
+const program = setup(withState(main), RENDERER_DRIVERS)
 program.run()

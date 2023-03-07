@@ -2,8 +2,7 @@ import { BrowserWindow, type WebContents } from 'electron'
 import { getCategory } from '../browser-window/utils'
 import { type IpcScope } from '@src/constants/ipc'
 import { type ChannelConfigToWebSink } from '@src/utils/observable'
-import { isAutoScope } from '@src/utils/cyclejs'
-import { Obj } from '@cycle-mega-driver/common/lib'
+import { Obj, isAutoScope } from '@cycle-mega-driver/common/lib'
 
 export function createIpcScope (scope: IpcScope): IpcScope {
   return scope

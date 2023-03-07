@@ -36,6 +36,12 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
-    "rxjs": "^7.8.0"
+    "@cycle/run": "^5.7.0",
+    "@cycle/state": "^1.7.0",
+    "rxjs": "^7.8.0",
+    "xstream": "^11.14.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.21"
   }
 }

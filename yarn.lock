@@ -33,7 +33,7 @@
     snabbdom-selector "^5.0.0"
     xstream "11.x"
 
-"@cycle/isolate@^5.2.0":
+"@cycle/isolate@^5.0.0", "@cycle/isolate@^5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@cycle/isolate/-/isolate-5.2.0.tgz#42150b2d6ffabf35e745acc8baee5184dda9c474"
   integrity sha512-BLyyd/EceQnuGaUVSBotdZkBEUeJq1zMbdK7LPdc7WMiJbinkduHue+rOe3BGbK3Ba7LGt7kjRBEfzLke9FGkg==
@@ -53,6 +53,16 @@
   version "10.5.0"
   resolved "https://registry.yarnpkg.com/@cycle/rxjs-run/-/rxjs-run-10.5.0.tgz#6e0d6effe96ec5c660e674306f88eff289b53cfd"
   integrity sha512-SZ2jAHpwbO6L4ZKxoxOOKFo4LLJKjw94zbJ3B8G7t+IWmRg2bOknQikqlgVqdJeIQiGyKItKjVW4n07nAhYP0A==
+
+"@cycle/state@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.npmjs.org/@cycle/state/-/state-1.7.0.tgz#afc07c2560e25377471ad6ef02db339b18c303de"
+  integrity sha512-nw0uH8yHqJNPwC56lQOs0oCfTQ89Ya99T7G/X2II+KjDgEr7Xs6FHGyd3DtrCuyH2tH81cbPc2VYPrj8tUeWdQ==
+  dependencies:
+    "@cycle/isolate" "^5.0.0"
+    "@cycle/run" "^5.2.0"
+    quicktask "1.2.0"
+    xstream ">=11"
 
 "@electron/get@^1.14.1":
   version "1.14.1"
@@ -8884,7 +8894,7 @@ ws@^3.1.0:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-"xstream@10.x || 11.x", xstream@11.x, xstream@^11.7.0:
+"xstream@10.x || 11.x", xstream@11.x, xstream@>=11, xstream@^11.14.0, xstream@^11.7.0:
   version "11.14.0"
   resolved "https://registry.yarnpkg.com/xstream/-/xstream-11.14.0.tgz#2c071d26b18310523b6877e86b4e54df068a9ae5"
   integrity sha512-1bLb+kKKtKPbgTK6i/BaoAn03g47PpFstlbe1BA+y3pNS/LfvcaghS5BFf9+EE1J+KwSQsEpfJvFN5GqFtiNmw==
