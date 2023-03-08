@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import { Observable, combineLatest, filter, map, merge, of, startWith, withLatestFrom } from 'rxjs'
 
-import { StateSource, setupAdapt, withState } from '@cycle-mega-driver/common/lib'
+import { Reducer, StateSource, setupAdapt, withState } from '@cycle-mega-driver/common/lib'
 import { setup } from '@cycle/rxjs-run'
 
 import { DatabaseCategory, User } from '../constants'
@@ -12,7 +12,7 @@ const main: MatchRendererMain<{
   SourceKeys: 'ipc' | 'dom'
   SinkKeys: 'ipc' | 'dom'
   ExtraSources: { state: StateSource<number> }
-  ExtraSinks: { state: Observable<any> }
+  ExtraSinks: { state: Observable<Reducer<number>> }
 }> = ({ ipc, dom, state }) => {
   const initialState$ = of(() => 0)
   const reducer$ = dom.events('click').pipe(map(() => (prevState: number) => prevState + 1))

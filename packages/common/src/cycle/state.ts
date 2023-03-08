@@ -2,13 +2,14 @@ import { Observable } from 'rxjs'
 import xs, { Stream } from 'xstream'
 
 import { StateSource as RawStateSource, Reducer, withState as withStateFn } from '@cycle/state'
-import { OSo } from '@cycle/state/lib/cjs/withState'
 
 import { xsToObservable } from './adapt'
 
+export { type Reducer } from '@cycle/state'
+
 export const withState = <
   T,
-  Sources extends OSo<T, 'state'> & Record<string, any>,
+  Sources extends Record<string, any> & { state: StateSource<T> },
   Sinks extends { state: Observable<Reducer<T>> } & Record<string, Observable<any>>
 >(main: (souces: Sources) => Sinks) => {
   type NormalizedSinks = Omit<Sinks, 'state'> & { state: Stream<Reducer<T>> }
