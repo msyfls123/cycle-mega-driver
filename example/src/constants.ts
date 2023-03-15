@@ -10,7 +10,7 @@ export interface IPCMainConfig {
 
 export interface IPCRendererConfig {
   'toggle-focus': boolean
-  'manipulate-document': IntoEntries<DocumentConfig<DatabaseModel, 'user', DatabaseCategory>>
+  'manipulate-document': IntoEntries<DocumentConfig<DatabaseModel, CategoryDocTypeMap>>
   language: string
 }
 
@@ -65,6 +65,12 @@ export type DatabaseModel = {
 export enum DatabaseCategory {
   Collection = 'collection',
   Document = 'document',
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type CategoryDocTypeMap = {
+  [DatabaseCategory.Collection]: 'user'
+  [DatabaseCategory.Document]: 'user'
 }
 
 export type DatabaseExtraComparators = unknown

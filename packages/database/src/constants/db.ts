@@ -7,8 +7,10 @@ export type Model = Record<string, IModel>
 export type DocType<M extends Model> = keyof M & string
 export type DocMethod = 'update' | 'create' | 'remove'
 
-export type Comparators = Record<string, unknown> | unknown
+export type Category<M extends Model> = Record<string, DocType<M>>
+export type CategoryKey<Cat extends Record<string, unknown>> = keyof Cat & string
 
+export type Comparators = Record<string, unknown> | unknown
 export type ComparatorMap<C extends Comparators> = {
   [K in keyof C]: (value: C[K], filter: C[K]) => boolean
 }

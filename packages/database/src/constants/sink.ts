@@ -2,43 +2,43 @@
 
 import { IntoEntries } from '@cycle-mega-driver/common/lib'
 
-import { Comparators, DocType, ICollectionOptions, Model } from './db'
+import { Category, CategoryKey, Comparators, ICollectionOptions, Model } from './db'
 
-export interface CollectionPayload<M extends Model, C extends Comparators, K extends string, T extends DocType<M> = DocType<M>> {
-  docType: T
+export interface CollectionPayload<M extends Model, C extends Comparators, Cat extends Category<M>, K extends CategoryKey<Cat> = CategoryKey<Cat>> {
+  docType: Cat[K]
   category: K
-  observableOptions: ICollectionOptions<M[T], C>
+  observableOptions: ICollectionOptions<M[Cat[K]], C>
 }
 
-export interface CreatePayload<M extends Model, T extends DocType<M>, Category extends string> {
-  doc: Omit<M[T], '_id'> & Pick<Partial<M[T]>, '_id'>
-  category: Category
-  docType: T
+export interface CreatePayload<M extends Model, Cat extends Category<M>, K extends CategoryKey<Cat>> {
+  doc: Omit<M[Cat[K]], '_id'> & Pick<Partial<M[Cat[K]]>, '_id'>
+  category: K
+  docType: Cat[K]
 }
 
-export interface DocPayload<M extends Model, T extends DocType<M>, Category extends string> {
-  doc: M[T]
-  category: Category
-  docType: T
+export interface DocPayload<M extends Model, Cat extends Category<M>, K extends CategoryKey<Cat>> {
+  doc: M[Cat[K]]
+  category: K
+  docType: Cat[K]
 }
 
 export interface SetupPayload {
   dbDir: string
 }
 
-export interface DocumentConfig<M extends Model, T extends DocType<M>, Category extends string> {
-  create: CreatePayload<M, T, Category>
-  update: DocPayload<M, T, Category>
-  remove: DocPayload<M, T, Category>
+export interface DocumentConfig<M extends Model, Cat extends Category<M>> {
+  create: CreatePayload<M, Cat, CategoryKey<Cat>>
+  update: DocPayload<M, Cat, CategoryKey<Cat>>
+  remove: DocPayload<M, Cat, CategoryKey<Cat>>
 }
 
 export interface DatabaseConfig<
   M extends Model,
   C extends Comparators,
-  Category extends string
-> extends DocumentConfig<M, DocType<M>, Category> {
-  collection: CollectionPayload<M, C, Category>
+  Cat extends Category<M>
+> extends DocumentConfig<M, Cat> {
+  collection: CollectionPayload<M, C, Cat>
   setup: SetupPayload
 }
 
-export type DatabaseSink<M extends Model, C extends Comparators, Category extends string> = IntoEntries<DatabaseConfig<M, C, Category>>
+export type DatabaseSink<M extends Model, C extends Comparators, Cat extends Category<M>> = IntoEntries<DatabaseConfig<M, C, Cat>>

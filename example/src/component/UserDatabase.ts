@@ -21,7 +21,7 @@ export const UserDatabase: MatchMain<{
     },
   })).pipe(delayWhen(() => databaseSetup$))
 
-  const docs$ = database.select(DatabaseCategory.Collection, 'user').pipe(
+  const docs$ = database.select(DatabaseCategory.Collection).pipe(
     map(({ docs }) => ipc.createSink({
       'user-list': docs,
     }))
