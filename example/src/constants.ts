@@ -67,7 +67,8 @@ export enum DatabaseCategory {
   Document = 'document',
 }
 
-export type DatabaseExtraComparators = never
+export type DatabaseExtraComparators = unknown
+export const COMPARATORS = {}
 
 export enum Category {
   Mainland = 'mainland',

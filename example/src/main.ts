@@ -96,7 +96,7 @@ const main: MainComponent = ({ browser, ipc, menu, lifecycle, database }) => {
     docType: 'user',
     category: DatabaseCategory.Document,
   })).pipe(
-    delayWhen(() => database.category(DatabaseCategory.Collection)),
+    delayWhen(() => database.waitCategoryRegistered(DatabaseCategory.Collection)),
   )
 
   database.errors(DatabaseCategory.Document).subscribe((err) => {

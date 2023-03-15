@@ -7,20 +7,29 @@ export type Model = Record<string, IModel>
 export type DocType<M extends Model> = keyof M & string
 export type DocMethod = 'update' | 'create' | 'remove'
 
-export type Comparators = string | never
+export type Comparators = Record<string, unknown> | unknown
 
-export type ComparatorMap<M, C extends Comparators> = {
-  [K in C]: (value: M, filter: M) => boolean
+export type ComparatorMap<C extends Comparators> = {
+  [K in keyof C]: (value: C[K], filter: C[K]) => boolean
 }
 
-type BaseComparators = 'gt' | 'lt' | 'includes'
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+type BaseComparators = {
+  gt: number
+  lt: number
+  includes: string
+}
+
+type KeyWithType<Obj extends Record<string, unknown>, T> = {
+  [K in keyof Obj]: Obj[K] extends T ? K : never
+}[keyof Obj]
 
 type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;
 }
 
 type RecursiveFilterType<T, C extends Comparators> = {
-  [P in keyof T]?: T[P] extends Record<string, unknown> ? RecursiveFilterType<T[P], C> : BaseComparators | C ;
+  [P in keyof T]?: T[P] extends Record<string, unknown> ? RecursiveFilterType<T[P], C> : KeyWithType<C & BaseComparators, T[P]>
 }
 
 export interface ICollectionOptions<M extends IModel, C extends Comparators = never> {

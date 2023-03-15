@@ -12,7 +12,7 @@ import { DatabaseDocsSource, DocsSources, ErrorSource } from '@src/constants/sou
 RxPouch.plugin(pouchLevelDB)
 
 interface DatabaseCtorOptions<M extends Model, C extends Comparators, Category extends string> {
-  comparatorMap: ComparatorMap<M, C>
+  comparatorMap: ComparatorMap<C>
   sink$: Observable<DatabaseSink<M, C, Category>>
 }
 
@@ -34,13 +34,13 @@ export class DatabaseSource<M extends Model, C extends Comparators, Category ext
     } as DatabaseSink<M, C, Category>
   }
 
-  category: <K extends Category> (category: K) => Observable<void>
+  waitCategoryRegistered: <K extends Category> (category: K) => Observable<void>
   errors: <K extends Category> (category: K) => Observable<ErrorSource<K>>
 }
 
 class Database<M extends Model, C extends Comparators, Category extends string = string> implements Database<M, C, Category> {
   private db: RxPouchDatabase
-  private readonly comparatorMap: ComparatorMap<M, C>
+  private readonly comparatorMap: ComparatorMap<C>
 
   private readonly collectionCache = new Map<keyof M, Collection<M[keyof M]>>()
 
@@ -85,7 +85,7 @@ class Database<M extends Model, C extends Comparators, Category extends string =
     ) as Observable<ErrorSource<K>>
   }
 
-  public category<K extends Category> (category: K) {
+  public waitCategoryRegistered<K extends Category> (category: K) {
     return this.categoryConn.pipe(
       filter((set) => set.has(category)),
       map(() => {})

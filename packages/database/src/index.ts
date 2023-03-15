@@ -5,7 +5,7 @@ import { IntoEntries, xsToObservable } from '@cycle-mega-driver/common/lib'
 import { Database, DatabaseSource } from './database'
 import './utils/polyfill'
 
-export function makeDatabaseDriver<M extends Model, C extends Comparators, Category extends string = string> (comparatorMap: ComparatorMap<M, C>) {
+export function makeDatabaseDriver<M extends Model, C extends Comparators, Category extends string = string> (comparatorMap: ComparatorMap<C>) {
   return (xs$: Stream<IntoEntries<DatabaseConfig<M, C, Category>>>): DatabaseSource<M, C, Category> => {
     const sink$ = xsToObservable(xs$)
 

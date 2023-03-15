@@ -1,5 +1,5 @@
 import { makeBrowserWindowDriver, makeIpcMainDriver, makeApplicationMenuDriver, makeAppLifecyleDriver } from '@cycle-mega-driver/electron/lib/main'
-import { DatabaseCategory, DatabaseExtraComparators, DatabaseModel, type IPCMainConfig, type IPCRendererConfig, type MenuId } from '../constants'
+import { COMPARATORS, DatabaseCategory, DatabaseExtraComparators, DatabaseModel, type IPCMainConfig, type IPCRendererConfig, type MenuId } from '../constants'
 import { type PickComponent, type CustomMain } from '@cycle-mega-driver/common/lib'
 import { makeDatabaseDriver } from '@cycle-mega-driver/database/lib'
 
@@ -8,7 +8,7 @@ export const MAIN_DRIVERS = {
   ipc: makeIpcMainDriver<IPCMainConfig, IPCRendererConfig>(['visible', 'user-list']),
   menu: makeApplicationMenuDriver<MenuId>(),
   lifecycle: makeAppLifecyleDriver(),
-  database: makeDatabaseDriver<DatabaseModel, DatabaseExtraComparators, DatabaseCategory>({})
+  database: makeDatabaseDriver<DatabaseModel, DatabaseExtraComparators, DatabaseCategory>(COMPARATORS)
 }
 
 type MainDrivers = typeof MAIN_DRIVERS
