@@ -19,4 +19,5 @@ export type MatchMain<Options extends {
   SinkKeys?: keyof MainDrivers
   ExtraSources?: unknown
   ExtraSinks?: unknown
-}> = PickComponent<MainDrivers, Options>
+  RestArgs?: any[]
+}> = PickComponent<MainDrivers, Options['RestArgs'], Options>

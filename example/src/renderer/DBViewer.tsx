@@ -1,41 +1,68 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import { Observable, combineLatest, filter, map, merge, of, startWith, withLatestFrom } from 'rxjs'
+import { Observable, combineLatest, filter, map, merge, of, share, startWith, withLatestFrom } from 'rxjs'
 
 import { Reducer, StateSource, setupAdapt, withState } from '@cycle-mega-driver/common/lib'
+import isolate from '@cycle/isolate'
 import { setup } from '@cycle/rxjs-run'
 
 import { DatabaseCategory, User } from '../constants'
+import { UserEditor } from './component/UserEditor'
 import { MatchRendererMain, RENDERER_DRIVERS } from './driver'
+
+interface State {
+  userId?: string
+}
 
 const main: MatchRendererMain<{
   SourceKeys: 'ipc' | 'dom'
   SinkKeys: 'ipc' | 'dom'
-  ExtraSources: { state: StateSource<number> }
-  ExtraSinks: { state: Observable<Reducer<number>> }
+  ExtraSources: { state: StateSource<State> }
+  ExtraSinks: { state: Observable<Reducer<State>> }
 }> = ({ ipc, dom, state }) => {
-  const initialState$ = of(() => 0)
-  const reducer$ = dom.events('click').pipe(map(() => (prevState: number) => prevState + 1))
+  const sharedUserList = ipc.select('user-list').pipe(
+    startWith([] as User[]),
+    share(),
+  )
+
+  const initialState$ = of(() => ({}))
+  const reducer1$ = dom.select('.row-user').events('click').pipe(
+    filter(evt => !['input', 'button'].includes((evt.target as HTMLInputElement).tagName.toLowerCase())),
+    map(evt => (evt.currentTarget as HTMLElement).dataset.id),
+    map((id) => (state: State) => ({
+      ...state,
+      userId: id === state.userId ? undefined : id,
+    })),
+  )
+  const reducer2$ = sharedUserList.pipe(map(() => (state: State) => ({
+    ...state,
+    userId: undefined,
+  })))
+
+  const selectUser$ = state.observable.pipe(
+    withLatestFrom(sharedUserList),
+    map(([{ userId }, users]) => users.find(user => user._id === userId)),
+    startWith(undefined),
+  )
+  const { dom: addForm$, ipc: addIpc$ } = isolate(UserEditor)({ dom, ipc, user: of(undefined) })
+
+  const { dom: editForm$, ipc: editIpc$ } = UserEditor({
+    dom,
+    ipc,
+    user: selectUser$,
+  })
 
   const domSink$ = combineLatest([
-    ipc.select('user-list').pipe(startWith([] as User[])),
+    sharedUserList,
     state.observable,
-  ]).pipe(map(([users, state]) => (
+    addForm$,
+    editForm$,
+  ]).pipe(map(([users, state, addForm, editForm]) => (
     <div className="container">
-      <form>
-        <div className="form-group mb-3">
-          <label>Name</label>
-          <input type="text" name="name-input" placeholder="Your name" required className="form-control"/>
-        </div>
-        <div className="form-group mb-3">
-          <label>Age</label>
-          <input type="number" name="age" placeholder="Your age" required className="form-control"/>
-        </div>
-        <button type="submit" className="btn btn-primary btn-sm">Submit</button>
-      </form>
+      {addForm}
       <div className="row justify-content-center"><div className="col col-md-auto">
-        <table className="table table-striped">
-          <thead>
+        <div className="table table-striped">
+          <header>
             <tr>
               <th scope="col">#</th>
               <th scope="col">Name</th>
@@ -43,23 +70,25 @@ const main: MatchRendererMain<{
               <th scope="col">Revision</th>
               <th scope="col">Action</th>
             </tr>
-          </thead>
-          <tbody>
+          </header>
+          <article>
             {users.map(({ name, age, _rev, _id }, index: number) => (
-              <tr>
-                <th scope="row">{index + 1}</th>
-                <td>{name}</td>
-                <td>{age}</td>
-                <td>{_rev}</td>
-                <td>
-                  <button className="btn btn-danger btn-remove btn-sm" data-id={_id}>&nbsp;×&nbsp;</button>
-                </td>
-              </tr>
+              _id === state.userId ? editForm : (
+                <tr className="row-user" data-id={_id}>
+                  <th scope="row">{index + 1}</th>
+                  <td>{name}</td>
+                  <td>{age}</td>
+                  <td>{_rev}</td>
+                  <td>
+                    <button className="btn btn-danger btn-remove btn-sm" data-id={_id}>&nbsp;×&nbsp;</button>
+                  </td>
+                </tr>
+              )
             ))}
-          </tbody>
-        </table>
+          </article>
+        </div>
       </div></div>
-      <p>Clicked: {state}</p>
+      <p>Clicked: {state.userId}</p>
     </div>
   )))
 
@@ -83,36 +112,14 @@ const main: MatchRendererMain<{
     filter(Boolean)
   )
 
-  const create$ = dom.select('form').events('submit').pipe(
-    map(e => {
-      e.preventDefault()
-      const form = e.target as HTMLFormElement
-      return ipc.createSink(
-        'manipulate-document',
-        {
-          key: 'create',
-          value: {
-            category: DatabaseCategory.Document,
-            docType: 'user',
-            doc: {
-              _id: form['name-input'].value,
-              name: form['name-input'].value,
-              age: Number(form.age.value),
-              type: 'user',
-            },
-          }
-        }
-      )
-    })
-  )
-
   return {
     ipc: merge(
       delete$,
-      create$,
+      addIpc$,
+      editIpc$,
     ),
     dom: domSink$,
-    state: merge(initialState$, reducer$),
+    state: merge(initialState$, reducer1$, reducer2$),
   }
 }
 

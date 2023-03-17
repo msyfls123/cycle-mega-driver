@@ -17,4 +17,5 @@ export type MatchRendererMain<Options extends {
   SinkKeys?: keyof RendererDrivers
   ExtraSources?: unknown
   ExtraSinks?: unknown
-}> = PickComponent<RendererDrivers, Options>
+  RestArgs?: any[]
+}> = PickComponent<RendererDrivers, Options['RestArgs'], Options>
