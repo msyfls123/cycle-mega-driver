@@ -16,20 +16,23 @@ export type CustomSinks<D extends Drivers> = {
 export type CustomMain<D extends Drivers> =
   (sources: Sources<D>) => CustomSinks<D>
 
-export interface PickComponentOptions<D extends Drivers> {
+export interface PickComponentOptions<D extends Drivers, R extends (any[] | undefined)> {
   SourceKeys: keyof D
   SinkKeys?: keyof D
   ExtraSources?: unknown
   ExtraSinks?: unknown
+  RestArgs?: R
 }
 
 type ValueOrDefault<A, B extends string | any> = B extends string ? B : A
+type EnsureArray<T> = T extends any[] ? T : []
 
 export type PickComponent<
   D extends Drivers,
-  options extends PickComponentOptions<D>
+  R extends (any[] | undefined),
+  options extends PickComponentOptions<D, R>,
 > =
-  (sources: Pick<Sources<D>, options['SourceKeys']> & options['ExtraSources']) =>
+  (sources: Pick<Sources<D>, options['SourceKeys']> & options['ExtraSources'], ...rest: EnsureArray<options['RestArgs']>) =>
   Pick<
   CustomSinks<D>,
   ValueOrDefault<options['SourceKeys'], options['SinkKeys']>
