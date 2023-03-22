@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/electron",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Electron drivers for making development painless.",
   "keywords": [
     "electron",
@@ -37,7 +37,7 @@
     "electron": "^19"
   },
   "dependencies": {
-    "@cycle-mega-driver/common": "^0.3.1",
+    "@cycle-mega-driver/common": "^0.3.2",
     "rxjs": "^7.8.0"
   }
 }

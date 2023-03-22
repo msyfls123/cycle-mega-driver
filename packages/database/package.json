@@ -1,6 +1,6 @@
 {
   "name": "@cycle-mega-driver/database",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Cyclejs bingdings for abstract-level database.",
   "keywords": [
     "cyclejs",
@@ -37,7 +37,7 @@
     "url": "https://github.com/msyfls123/cycle-mega-driver/issues"
   },
   "dependencies": {
-    "@cycle-mega-driver/common": "^0.3.1",
+    "@cycle-mega-driver/common": "^0.3.2",
     "deep-array-filter": "^1.0.4",
     "fast-sort": "^1.5.4",
     "leveldown": "^6.1.1",
