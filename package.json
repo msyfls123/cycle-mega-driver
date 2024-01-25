@@ -68,6 +68,7 @@
     "watch-packages": "lerna watch -- lerna run build --scope=\\$LERNA_PACKAGE_NAME",
     "example": "rollup -c example/rollup.config.mjs",
     "run-example": "cross-env DEBUG=* electron example/dist/main.js",
+    "badge": "node scripts/generate-badges.js",
     "postinstall": "patch-package"
   },
   "peerDependencies": {

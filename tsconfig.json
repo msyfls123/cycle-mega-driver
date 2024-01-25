@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "esnext",
-        "moduleResolution": "nodenext",
+        "moduleResolution": "Classic",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "declaration": true,

@@ -1,3 +1,9 @@
+<!-- BADGES -->
+[![@cycle-mega-driver/common](https://img.shields.io/npm/v/@cycle-mega-driver/common.svg?style=flat-square&label=%40cycle-mega-driver%2Fcommon)](https://www.npmjs.com/package/@cycle-mega-driver/common)  
+[![@cycle-mega-driver/database](https://img.shields.io/npm/v/@cycle-mega-driver/database.svg?style=flat-square&label=%40cycle-mega-driver%2Fdatabase)](https://www.npmjs.com/package/@cycle-mega-driver/database)  
+[![@cycle-mega-driver/electron](https://img.shields.io/npm/v/@cycle-mega-driver/electron.svg?style=flat-square&label=%40cycle-mega-driver%2Felectron)](https://www.npmjs.com/package/@cycle-mega-driver/electron)
+<!-- BADGES END -->
+
 # @cycle-mega-driver
 
 Let main-process listen to renderer, renderer listen to main-process, Electron listen to you.
